@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"io"
 	"log"
 	"os"
@@ -34,27 +36,78 @@ func main() {
 	// restore the echoing state when exiting
 	defer exec.Command("stty", "-F", "/dev/tty", "echo").Run()
 
-	processing := true
-	for processing {
-		data, err := input.ReadBytes('{')
-		if err != nil && err != io.EOF {
-			log.Println("read err", err)
-			return
-		}
-		processing = err != io.EOF
+	var messages []*GREMessage
 
-		_, err = output.Write(data)
+	var buf bytes.Buffer
+	for {
+		input.WriteTo(&buf)
+		_, err := buf.ReadBytes('{')
+		if err == io.EOF {
+			break
+		}
+		buf.UnreadByte()
+
+		var m Message
+		dec := json.NewDecoder(&buf)
+		err = dec.Decode(&m)
 		if err != nil {
-			log.Println("log err", err)
+			log.Println("JSON decode error:", err)
 			return
 		}
 
-		_, err = os.Stdout.Write(data)
-		if err != nil {
-			log.Println("terminal err", err)
-			return
+		for _, mes := range m.GREToClientEvent.GREToClientMessages {
+			if mes.Type == "GREMessageType_GameStateMessage" {
+				messages = append(messages, mes)
+			}
 		}
 
-		os.Stdin.Read(userInput)
+		var newBuf bytes.Buffer
+		newBuf.ReadFrom(dec.Buffered())
+		newBuf.ReadFrom(&buf)
+		buf = newBuf
 	}
+
+	log.Println("Ready for input...")
+	enc := json.NewEncoder(output)
+	for _, m := range messages {
+		os.Stdin.Read(userInput)
+		msg := &Message{}
+		msg.GREToClientEvent.GREToClientMessages = []*GREMessage{m}
+		enc.Encode(msg)
+	}
+}
+
+type Message struct {
+	GREToClientEvent struct {
+		GREToClientMessages []*GREMessage
+	}
+}
+
+type GREMessage struct {
+	Type             string
+	GameStateMessage struct {
+		Type  string
+		Zones []struct {
+			ZoneID            int
+			ObjectInstanceIDs []int
+		}
+		GameObjects []struct {
+			InstanceID       int
+			GrpID            int
+			ControllerSeatID int
+			CardTypes        []string
+		}
+		DiffDeletedInstanceIDs []int
+	}
+}
+
+type GameState struct {
+	PlayerHand         []int
+	PlayerLands        []int
+	PlayerCreatures    []int
+	PlayerPermanents   []int
+	OpponentHand       []int
+	OpponentLands      []int
+	OpponentCreatures  []int
+	OpponentPermanents []int
 }

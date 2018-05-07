@@ -1,4 +1,18 @@
-# Stolen from https://github.com/shawkinsl/mtga-tracker/blob/master/scripts/generate_base_mtga_id_lookup.py
+with open('mtga_tracker/util.py', 'w') as f:
+    f.write('''
+import app.models.set as set
+import app.set_data.xln as xln
+import app.set_data.rix as rix
+import app.set_data.hou as hou
+import app.set_data.akh as akh
+import app.set_data.dom as dom
+import app.set_data.weird as weird
+
+all_mtga_cards = set.Pool.from_sets("mtga_cards",
+                                    sets=[rix.RivalsOfIxalan, xln.Ixalan, hou.HourOfDevastation, akh.Amonkhet,
+                                          dom.Dominaria, weird.WeirdLands])
+''')
+
 
 import sys, os, time
 sys.path.append("./mtga_tracker")
@@ -8,25 +22,25 @@ from urllib.request import urlretrieve
 for card in all_mtga_cards.cards:
     if card.set_number < 0:
         continue
-    folder = "overlay/public/cards/{:02d}".format(card.mtga_id%20)
+    folder = "cards/{:02d}".format(card.mtga_id%20)
     if not os.path.exists(folder):
         os.makedirs(folder)
 
-    url = "https://img.scryfall.com/cards/png/en/{}/{:d}.png".format(card.set.lower(), card.set_number)
-    path = "{}/{:d}.png".format(folder,card.mtga_id)
+    url = "https://img.scryfall.com/cards/normal/en/{}/{:d}.jpg".format(card.set.lower(), card.set_number)
+    path = "{}/{:d}.jpg".format(folder,card.mtga_id)
     if not os.path.exists(path):
         print("{} -> {}".format(url, path))
         try:
             urlretrieve(url, path)
         except:
-            url = "https://img.scryfall.com/cards/png/en/{}/{:d}a.png".format(card.set.lower(), card.set_number)
+            url = "https://img.scryfall.com/cards/normal/en/{}/{:d}a.jpg".format(card.set.lower(), card.set_number)
             try:
                 urlretrieve(url, path)
             except:
                 pass
 
-    url = "https://img.scryfall.com/cards/png/en/{}/{:d}b.png".format(card.set.lower(), card.set_number)
-    path = "{}/{:d}_back.png".format(folder,card.mtga_id)
+    url = "https://img.scryfall.com/cards/normal/en/{}/{:d}b.jpg".format(card.set.lower(), card.set_number)
+    path = "{}/{:d}_back.jpg".format(folder,card.mtga_id)
     if not os.path.exists(path):
         print("{} -> {}".format(url, path))
         try:

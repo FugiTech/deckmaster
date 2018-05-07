@@ -1,0 +1,3 @@
+[submodule "mtga_tracker"]
+	path = mtga_tracker
+	url = git@github.com:shawkinsl/mtga-tracker.git
