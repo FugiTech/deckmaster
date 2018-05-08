@@ -1,9 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/zserge/webview"
@@ -12,7 +11,7 @@ import (
 func (svc *service) window() error {
 	window := webview.New(webview.Settings{
 		Title:                  "Deckmaster: MTG Arena Overlay",
-		URL:                    "http://localhost:22223",
+		URL:                    "http://localhost:22223?" + strconv.Itoa(int(time.Now().Unix())),
 		Width:                  400,
 		Height:                 200,
 		Resizable:              false,
@@ -24,29 +23,7 @@ func (svc *service) window() error {
 
 	go func() {
 		defer window.Exit()
-
-		window.Dispatch(func() {
-			window.Eval(fmt.Sprintf(`store.commit('version', %q)`, VERSION))
-		})
-
-		timer := time.NewTicker(5 * time.Second)
-		defer timer.Stop()
-
-		for {
-			select {
-			case <-svc.ctx.Done():
-				return
-			case <-timer.C:
-				data, err := json.Marshal(map[string]interface{}{
-					"Twitch": svc.pubsubStatus.Load(),
-				})
-				if err == nil {
-					window.Dispatch(func() {
-						window.Eval(fmt.Sprintf(`store.commit('status', %s)`, data))
-					})
-				}
-			}
-		}
+		<-svc.ctx.Done()
 	}()
 
 	window.Run()
@@ -54,5 +31,5 @@ func (svc *service) window() error {
 }
 
 func (svc *service) invokeCallback(w webview.WebView, data string) {
-
+	svc.logger.Println(data)
 }

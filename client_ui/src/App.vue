@@ -87,6 +87,10 @@ export default {
     font-style: normal;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 html, body, #app {
   height: 100%;
   width: 100%;
@@ -98,11 +102,12 @@ html, body, #app {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Montserrat';
+  font-family: Montserrat, Verdana, Helvetica, Arial, sans-serif;
 }
 #innerApp {
   height: 200px;
   width: 400px;
+  padding: 0 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -132,14 +137,15 @@ html, body, #app {
   flex: auto;
 }
 #help {
-  margin: 5px;
+  max-width: 100%;
   font-size: 14px;
   font-weight: 500;
 }
 #version {
-  font-size: 10px;
   width: 100%;
+  padding-top: 6px;
   text-align: right;
+  font-size: 10px;
   font-weight: 300;
 }
 </style>

@@ -42,6 +42,7 @@ func main() {
 		<-ctx.Done()
 		time.Sleep(5 * time.Second)
 		pprof.Lookup("goroutine").WriteTo(os.Stdout, 1)
+		os.Exit(1)
 	}()
 
 	svc := &service{

@@ -27,6 +27,15 @@ func (svc *service) server() error {
 		ioutil.WriteFile(tokenFilename, []byte(token), 0664)
 	})
 
+	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"version": VERSION,
+			"status": map[string]interface{}{
+				"Twitch": svc.pubsubStatus.Load(),
+			},
+		})
+	})
+
 	server := http.Server{
 		Addr:     "127.0.0.1:22223",
 		ErrorLog: svc.logger,

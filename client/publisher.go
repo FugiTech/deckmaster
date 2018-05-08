@@ -15,7 +15,9 @@ func (svc *service) publisher() error {
 		case <-svc.ctx.Done():
 			return nil
 		case <-timer.C:
-			svc.pubsubStatus.Store(svc.publish())
+			status := svc.publish()
+			svc.logger.Println("pubsubStatus:", status)
+			svc.pubsubStatus.Store(status)
 		}
 	}
 }
@@ -25,7 +27,7 @@ func (svc *service) publish() string {
 	if !ok {
 		return "No token available"
 	}
-	if !token.Expires.Before(time.Now()) {
+	if token.Expires.Before(time.Now()) {
 		return "Token has expired"
 	}
 

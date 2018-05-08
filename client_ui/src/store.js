@@ -27,6 +27,14 @@ let s = new Vuex.Store({
   actions: {},
 })
 
-window.store = s // Needed for interaction with go
+import 'promise-polyfill/src/polyfill'
+import 'whatwg-fetch'
+let update = async function() {
+  let r = await fetch('http://localhost:22223/data')
+  let d = await r.json()
+  for (let [k, v] of Object.entries(d)) s.commit(k, v)
+}
+update()
+setInterval(update, 5000)
 
 export default s
