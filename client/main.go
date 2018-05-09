@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"io/ioutil"
 	"log"
@@ -22,13 +23,16 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	logger := log.New(logFile, "", log.LstdFlags|log.Lshortfile)
+	defer logFile.Close()
+	logStream := bufio.NewWriter(logFile)
+	defer logStream.Flush()
+	logger := log.New(logStream, "", log.LstdFlags|log.Lshortfile)
 
 	var token Token
 	if data, derr := ioutil.ReadFile(tokenFilename); derr == nil {
 		token = parseToken(string(data))
 	} else {
-		// Make folder
+		os.MkdirAll(filepath.Dir(tokenFilename), 0755)
 	}
 
 	reader, writer, err := os.Pipe()
@@ -40,8 +44,9 @@ func main() {
 	eg, ctx := errgroup.WithContext(ctx)
 	go func() {
 		<-ctx.Done()
-		time.Sleep(5 * time.Second)
-		pprof.Lookup("goroutine").WriteTo(os.Stdout, 1)
+		time.Sleep(30 * time.Second)
+		pprof.Lookup("goroutine").WriteTo(logStream, 1)
+		logStream.Flush()
 		os.Exit(1)
 	}()
 

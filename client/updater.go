@@ -1,5 +1,7 @@
 package main
 
+import "time"
+
 func (svc *service) updater() error {
 	var gameState GameState
 	gameObjects := map[int]GameObject{}
@@ -64,6 +66,7 @@ func (svc *service) updater() error {
 			}
 		}
 
+		gameState.updatedAt = time.Now()
 		svc.globalGameState.Store(gameState)
 	}
 	return nil

@@ -17,6 +17,7 @@ type service struct {
 	reader          *os.File
 	messageChannel  chan *GREMessage
 	pubsubStatus    atomic.Value
+	arenaStatus     atomic.Value
 }
 
 type Token struct {
@@ -60,4 +61,5 @@ type GameState struct {
 	OpponentLands      []int
 	OpponentCreatures  []int
 	OpponentPermanents []int
+	updatedAt          time.Time
 }

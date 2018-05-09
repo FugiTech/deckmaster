@@ -8,6 +8,8 @@ import (
 	"github.com/zserge/webview"
 )
 
+var ErrWindowClosed = errors.New("window closed")
+
 func (svc *service) window() error {
 	window := webview.New(webview.Settings{
 		Title:                  "Deckmaster: MTG Arena Overlay",
@@ -22,12 +24,17 @@ func (svc *service) window() error {
 	}
 
 	go func() {
-		defer window.Exit()
 		<-svc.ctx.Done()
+		if svc.ctx.Err() != ErrWindowClosed {
+			window.Dispatch(func() {
+				window.Dialog(webview.DialogTypeAlert, webview.DialogFlagError, "Fatal Error", "Deckmaster has encountered an error and must stop.\n\nTry reopening Deckmaster and contact @Fugiman or fugi@fugiman.com if this persists.")
+				window.Terminate()
+			})
+		}
 	}()
 
 	window.Run()
-	return errors.New("window closed")
+	return ErrWindowClosed
 }
 
 func (svc *service) invokeCallback(w webview.WebView, data string) {

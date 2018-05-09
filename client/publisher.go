@@ -16,7 +16,6 @@ func (svc *service) publisher() error {
 			return nil
 		case <-timer.C:
 			status := svc.publish()
-			svc.logger.Println("pubsubStatus:", status)
 			svc.pubsubStatus.Store(status)
 		}
 	}
@@ -33,7 +32,12 @@ func (svc *service) publish() string {
 
 	gs, ok := svc.globalGameState.Load().(GameState)
 	if !ok {
-		return ""
+		return "Unable to read gamestate"
+	}
+	if time.Since(gs.updatedAt) > 20*time.Second {
+		if msg, _ := svc.arenaStatus.Load().(string); msg == "" {
+			svc.arenaStatus.Store("Game state not changing")
+		}
 	}
 
 	data, err := json.Marshal(gs)

@@ -32,6 +32,7 @@ func (svc *service) server() error {
 			"version": VERSION,
 			"status": map[string]interface{}{
 				"Twitch": svc.pubsubStatus.Load(),
+				"Arena":  svc.arenaStatus.Load(),
 			},
 		})
 	})
