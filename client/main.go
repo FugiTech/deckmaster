@@ -42,13 +42,16 @@ func main() {
 	}
 
 	eg, ctx := errgroup.WithContext(ctx)
-	go func() {
-		<-ctx.Done()
-		time.Sleep(30 * time.Second)
-		pprof.Lookup("goroutine").WriteTo(logStream, 1)
-		logStream.Flush()
-		os.Exit(1)
-	}()
+	if os.Getenv("DEBUG") != "" {
+		go func() {
+			<-ctx.Done()
+			time.Sleep(30 * time.Second)
+			logger.Println("Force closing, goroutine stuck")
+			pprof.Lookup("goroutine").WriteTo(logStream, 1)
+			logStream.Flush()
+			os.Exit(1)
+		}()
+	}
 
 	svc := &service{
 		ctx:            ctx,

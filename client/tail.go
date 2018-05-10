@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 
@@ -20,9 +19,6 @@ func (svc *service) tail() error {
 	if err != nil {
 		svc.arenaStatus.Store("Unable to read log")
 		return err
-	} else {
-		svc.arenaStatus.Store("Unable to read log")
-		return errors.New("Unable to read MTG Arena log")
 	}
 
 	for {

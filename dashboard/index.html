@@ -4,24 +4,34 @@
   <title>Deckmaster: MTG Arena Overlay</title>
   <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
 <body>
+  <div id="loading"></div>
+  <span id="resend">RESEND TOKEN</span>
 
 <script>
-let initialized = false
 let token
 
 window.Twitch.ext.onAuthorized(auth => {
   token = auth.token
-  console.log(token)
+  sendToken(token)
+})
+
+document.getElementById('resend').addEventListener('click', () => {
   sendToken(token)
 })
 
 function sendToken(token) {
   let i = new Image()
+  document.body.style.background = '#999'
+  document.getElementById('loading').style.display = ''
+  document.getElementById('resend').style.display = ''
   i.onerror = () => {
     document.body.style.background = '#F99'
+    document.getElementById('loading').style.display = 'none'
+    document.getElementById('resend').style.display = 'inline-block'
   }
   i.onload = () => {
     document.body.style.background = '#9F9'
+    document.getElementById('loading').style.display = 'none'
   }
   i.src = `http://localhost:22223/auth?token=${token}`
 }
@@ -41,6 +51,35 @@ body {
   align-items: center;
   justify-content: center;
 
+  background: #999;
   transition: background-color 1s ease;
+}
+
+@keyframes grow {
+  from {
+    width: 0;
+    height: 0;
+  }
+  to {
+    width: 200vmax;
+    height: 200vmax;
+  }
+}
+
+#loading {
+  position: absolute;
+  animation: 1s linear infinite grow;
+  border-radius: 50%;
+  border: 20px solid black;
+  opacity: 0.3;
+}
+
+#resend {
+  display: none;
+  padding: 5px 10px;
+}
+#resend:hover {
+  border: 2px solid black;
+  cursor: pointer;
 }
 </style>

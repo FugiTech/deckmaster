@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -25,6 +26,7 @@ func (svc *service) server() error {
 		token := r.FormValue("token")
 		svc.token.Store(parseToken(token))
 		ioutil.WriteFile(tokenFilename, []byte(token), 0664)
+		fmt.Fprint(w, "GIF89a\x01\x00\x01\x00\x80\x01\x00\xFF\xFF\xFF\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B")
 	})
 
 	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {

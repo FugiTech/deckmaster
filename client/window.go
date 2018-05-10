@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"strconv"
+	"sync/atomic"
 	"time"
 
 	"github.com/zserge/webview"
@@ -23,17 +24,19 @@ func (svc *service) window() error {
 		return errors.New("Failed to create window")
 	}
 
+	var running atomic.Value
+	running.Store(true)
+
 	go func() {
 		<-svc.ctx.Done()
-		if svc.ctx.Err() != ErrWindowClosed {
-			window.Dispatch(func() {
-				window.Dialog(webview.DialogTypeAlert, webview.DialogFlagError, "Fatal Error", "Deckmaster has encountered an error and must stop.\n\nTry reopening Deckmaster and contact @Fugiman or fugi@fugiman.com if this persists.")
-				window.Terminate()
-			})
+		if running.Load().(bool) {
+			window.Dialog(webview.DialogTypeAlert, webview.DialogFlagError, "Fatal Error", "Deckmaster has encountered an error and must stop.\n\nTry reopening Deckmaster and contact @Fugiman or fugi@fugiman.com if this persists.")
+			window.Dispatch(window.Terminate)
 		}
 	}()
 
 	window.Run()
+	running.Store(false)
 	return ErrWindowClosed
 }
 
