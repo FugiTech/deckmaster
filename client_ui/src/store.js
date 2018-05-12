@@ -30,7 +30,7 @@ let s = new Vuex.Store({
 import 'promise-polyfill/src/polyfill'
 import 'whatwg-fetch'
 let update = async function() {
-  let r = await fetch('http://localhost:22223/data')
+  let r = await fetch('http://localhost:22223/data?time=' + +new Date())
   let d = await r.json()
   for (let [k, v] of Object.entries(d)) s.commit(k, v)
 }

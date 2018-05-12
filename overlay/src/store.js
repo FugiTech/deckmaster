@@ -3,18 +3,36 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
+let store = new Vuex.Store({
   state: {
-    gamestate: {
-      PlayerHand: [67015,65527,66619,67011,65491,65081,67011],
+    game: {
+      PlayerHand: [],
+      PlayerLands: [],
+      PlayerCreatures: [],
+      PlayerPermanents: [],
+      OpponentHand: [],
+      OpponentLands: [],
+      OpponentCreatures: [],
+      OpponentPermanents: [],
     },
   },
   mutations: {
     setGamestate(state, gamestate) {
-      this.gamestate = gamestate
-    }
+      state.game.PlayerHand = gamestate.PlayerHand || []
+      state.game.PlayerLands = gamestate.PlayerLands || []
+      state.game.PlayerCreatures = gamestate.PlayerCreatures || []
+      state.game.PlayerPermanents = gamestate.PlayerPermanents || []
+      state.game.OpponentHand = gamestate.OpponentHand || []
+      state.game.OpponentLands = gamestate.OpponentLands || []
+      state.game.OpponentCreatures = gamestate.OpponentCreatures || []
+      state.game.OpponentPermanents = gamestate.OpponentPermanents || []
+    },
   },
-  actions: {
-
-  }
+  actions: {},
 })
+
+window.Twitch.ext.listen('broadcast', (target, contentType, message) => {
+  store.commit('setGamestate', JSON.parse(message))
+})
+
+export default store

@@ -1,9 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"log"
-	"os"
 	"sync/atomic"
 	"time"
 )
@@ -13,8 +13,7 @@ type service struct {
 	logger          *log.Logger
 	globalGameState atomic.Value
 	token           atomic.Value
-	writer          *os.File
-	reader          *os.File
+	pipe            bytes.Buffer
 	messageChannel  chan *GREMessage
 	pubsubStatus    atomic.Value
 	arenaStatus     atomic.Value

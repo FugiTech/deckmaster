@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"io"
@@ -11,16 +10,13 @@ import (
 func (svc *service) parser() error {
 	defer func() { close(svc.messageChannel) }()
 
-	bufreader := bufio.NewReader(svc.reader)
-
 	var buf bytes.Buffer
 	for {
 		if svc.ctx.Err() != nil {
 			return svc.ctx.Err()
 		}
 
-		svc.reader.SetReadDeadline(time.Now().Add(1 * time.Second))
-		bufreader.WriteTo(&buf)
+		buf.ReadFrom(&svc.pipe)
 		_, err := buf.ReadBytes('{')
 		if err == io.EOF {
 			time.Sleep(1 * time.Second)

@@ -1,5 +1,5 @@
 <template>
-  <img :src="src" @load="loaded = true" :style="{opacity: loaded ? 100 : 0}" />
+  <img class="card" :src="src" @load="loaded = true" :style="{opacity: loaded ? 100 : 0}" />
 </template>
 
 <script>
@@ -12,7 +12,9 @@ export default {
     }
   },
   watch: {
-    'src': function() { this.loaded = false },
-  }
+    src: function() {
+      this.loaded = false
+    },
+  },
 }
 </script>

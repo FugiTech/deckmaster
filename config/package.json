@@ -1,31 +1,19 @@
 {
   "name": "config",
-  "description": "A Vue.js project",
-  "version": "1.0.0",
-  "author": "Fugi <fugiman47@gmail.com>",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --open --inline --hot",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
   },
   "dependencies": {
-    "vue": "^2.5.3",
-    "vuetify": "^1.0.0"
+    "vue": "^2.5.16",
+    "vuetify": "^1.0.17"
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
-    "babel-preset-env": "^1.6.0",
-    "babel-preset-stage-2": "^6.24.1",
-    "cross-env": "^5.0.5",
-    "css-loader": "^0.28.7",
-    "file-loader": "^1.1.4",
-    "style-loader": "^0.13.1",
-    "stylus": "^0.54.5",
-    "stylus-loader": "^3.0.1",
-    "vue-loader": "^13.0.5",
-    "vue-template-compiler": "^2.5.3",
-    "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.9.1"
-  }
+    "@vue/cli-plugin-babel": "^3.0.0-beta.10",
+    "@vue/cli-service": "^3.0.0-beta.10",
+    "vue-template-compiler": "^2.5.13"
+  },
+  "browserslist": ["> 1%", "last 2 versions", "not ie <= 8"]
 }

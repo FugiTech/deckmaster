@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	_ "net/http/pprof"
+
 	_ "github.com/fugiman/deckmaster/client/statik"
 	"github.com/rakyll/statik/fs"
 )

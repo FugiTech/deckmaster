@@ -35,12 +35,6 @@ func main() {
 		os.MkdirAll(filepath.Dir(tokenFilename), 0755)
 	}
 
-	reader, writer, err := os.Pipe()
-	if err != nil {
-		logger.Println("error making pipe:", err)
-		return
-	}
-
 	eg, ctx := errgroup.WithContext(ctx)
 	if os.Getenv("DEBUG") != "" {
 		go func() {
@@ -56,8 +50,6 @@ func main() {
 	svc := &service{
 		ctx:            ctx,
 		logger:         logger,
-		writer:         writer,
-		reader:         reader,
 		messageChannel: make(chan *GREMessage, 100),
 	}
 	svc.token.Store(token)

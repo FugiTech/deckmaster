@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 
@@ -8,7 +9,6 @@ import (
 )
 
 func (svc *service) tail() error {
-	defer svc.writer.Close()
 	outputLogLocation := filepath.Join(os.Getenv("APPDATA"), "..", "LocalLow", "Wizards Of The Coast", "MTGA", "output_log.txt")
 	t, err := tail.TailFile(outputLogLocation, tail.Config{
 		ReOpen: true,
@@ -28,10 +28,11 @@ func (svc *service) tail() error {
 			return nil
 		case line, ok := <-t.Lines:
 			if line != nil {
-				svc.writer.WriteString(line.Text + "\n")
+				svc.pipe.WriteString(line.Text + "\n")
 			}
 			if !ok {
-				return nil
+				svc.arenaStatus.Store("Unable to read log")
+				return errors.New("Tail.Lines closed unexpectedly")
 			}
 		}
 	}

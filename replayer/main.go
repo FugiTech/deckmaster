@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	f, err := os.Open("test.log")
+	f, err := os.Open("test_log.txt")
 	if err != nil {
 		log.Println("input err", err)
 		return
@@ -99,15 +99,4 @@ type GREMessage struct {
 		}
 		DiffDeletedInstanceIDs []int
 	}
-}
-
-type GameState struct {
-	PlayerHand         []int
-	PlayerLands        []int
-	PlayerCreatures    []int
-	PlayerPermanents   []int
-	OpponentHand       []int
-	OpponentLands      []int
-	OpponentCreatures  []int
-	OpponentPermanents []int
 }

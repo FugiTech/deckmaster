@@ -2,41 +2,12 @@
 <html>
 <head>
   <title>Deckmaster: MTG Arena Overlay</title>
-  <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
 <body>
   <div id="loading"></div>
   <span id="resend">RESEND TOKEN</span>
 
-<script>
-let token
-
-window.Twitch.ext.onAuthorized(auth => {
-  token = auth.token
-  sendToken(token)
-})
-
-document.getElementById('resend').addEventListener('click', () => {
-  sendToken(token)
-})
-
-function sendToken(token) {
-  let i = new Image()
-  document.body.style.background = '#999'
-  document.getElementById('loading').style.display = ''
-  document.getElementById('resend').style.display = ''
-  i.onerror = () => {
-    document.body.style.background = '#F99'
-    document.getElementById('loading').style.display = 'none'
-    document.getElementById('resend').style.display = 'inline-block'
-  }
-  i.onload = () => {
-    document.body.style.background = '#9F9'
-    document.getElementById('loading').style.display = 'none'
-  }
-  i.src = `http://localhost:22223/auth?token=${token}`
-}
-</script>
-
+<script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+<script src="main.js"></script>
 <style>
 html, body {
   height: 100%;
