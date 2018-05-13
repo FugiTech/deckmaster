@@ -55,11 +55,14 @@ func main() {
 	svc.token.Store(token)
 
 	eg.Go(svc.server)
-	eg.Go(svc.window)
 	eg.Go(svc.tail)
 	eg.Go(svc.parser)
 	eg.Go(svc.updater)
 	eg.Go(svc.publisher)
+
+	if werr := svc.window(); werr != nil {
+		cancel()
+	}
 
 	err = eg.Wait()
 	if err != nil {

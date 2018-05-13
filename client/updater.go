@@ -5,10 +5,13 @@ import "time"
 func (svc *service) updater() error {
 	var gameState GameState
 	gameObjects := map[int]GameObject{}
+	seatID := 0
+
 	for m := range svc.messageChannel {
 		if m.GameStateMessage.Type == "GameStateType_Full" {
 			gameState = GameState{}
 			gameObjects = map[int]GameObject{}
+			seatID = m.SystemSeatIDs[0]
 		}
 
 		for _, object := range m.GameStateMessage.GameObjects {
@@ -31,31 +34,36 @@ func (svc *service) updater() error {
 				switch {
 				case !ok:
 					// Skip it
-				case o.ControllerSeatID == 1 && contains(o.CardTypes, "CardType_Land"):
+				case o.ControllerSeatID == seatID && contains(o.CardTypes, "CardType_Land"):
 					lands = append(lands, o.GrpID)
-				case o.ControllerSeatID == 1 && contains(o.CardTypes, "CardType_Creature"):
+				case o.ControllerSeatID == seatID && contains(o.CardTypes, "CardType_Creature"):
 					creatures = append(creatures, o.GrpID)
-				case o.ControllerSeatID == 1:
+				case o.ControllerSeatID == seatID:
 					other = append(other, o.GrpID)
-				case o.ControllerSeatID == 2 && contains(o.CardTypes, "CardType_Land"):
+				case o.ControllerSeatID != seatID && contains(o.CardTypes, "CardType_Land"):
 					opp_lands = append(opp_lands, o.GrpID)
-				case o.ControllerSeatID == 2 && contains(o.CardTypes, "CardType_Creature"):
+				case o.ControllerSeatID != seatID && contains(o.CardTypes, "CardType_Creature"):
 					opp_creatures = append(opp_creatures, o.GrpID)
-				case o.ControllerSeatID == 2:
+				case o.ControllerSeatID != seatID:
 					opp_other = append(opp_other, o.GrpID)
 				}
 			}
+
+			PlayerHand := append(append(append([]int{}, lands...), creatures...), other...)
+			OpponentHand := append(append(append([]int{}, opp_lands...), opp_creatures...), opp_other...)
 			switch zone.ZoneID {
 			case 31:
-				gameState.PlayerHand = nil
-				gameState.PlayerHand = append(gameState.PlayerHand, lands...)
-				gameState.PlayerHand = append(gameState.PlayerHand, creatures...)
-				gameState.PlayerHand = append(gameState.PlayerHand, other...)
+				if seatID == 1 {
+					gameState.PlayerHand = PlayerHand
+				} else {
+					gameState.OpponentHand = OpponentHand
+				}
 			case 35:
-				gameState.OpponentHand = nil
-				gameState.OpponentHand = append(gameState.OpponentHand, opp_lands...)
-				gameState.OpponentHand = append(gameState.OpponentHand, opp_creatures...)
-				gameState.OpponentHand = append(gameState.OpponentHand, opp_other...)
+				if seatID == 1 {
+					gameState.OpponentHand = OpponentHand
+				} else {
+					gameState.PlayerHand = PlayerHand
+				}
 			case 28: // The ENTIRE battlefield
 				gameState.PlayerLands = lands
 				gameState.PlayerCreatures = creatures
@@ -64,6 +72,11 @@ func (svc *service) updater() error {
 				gameState.OpponentCreatures = opp_creatures
 				gameState.OpponentPermanents = opp_other
 			}
+		}
+
+		if m.Type == "GREMessageType_IntermissionReq" {
+			gameState = GameState{}
+			gameObjects = map[int]GameObject{}
 		}
 
 		gameState.updatedAt = time.Now()

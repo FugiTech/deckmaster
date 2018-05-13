@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"time"
 )
 
@@ -18,7 +17,7 @@ func (svc *service) parser() error {
 
 		buf.ReadFrom(&svc.pipe)
 		_, err := buf.ReadBytes('{')
-		if err == io.EOF {
+		if err != nil {
 			time.Sleep(1 * time.Second)
 			continue
 		}
@@ -33,7 +32,8 @@ func (svc *service) parser() error {
 		}
 
 		for _, mes := range m.GREToClientEvent.GREToClientMessages {
-			if mes.Type == "GREMessageType_GameStateMessage" {
+			if mes.Type == "GREMessageType_GameStateMessage" ||
+				mes.Type == "GREMessageType_IntermissionReq" {
 				svc.messageChannel <- mes
 			}
 		}

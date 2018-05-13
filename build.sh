@@ -6,8 +6,8 @@
 # >docker-machine ssh
 # >cd /var/lib/boot2docker
 # >sudo vi profile
-# Turn TLS_WHATEVER to "no"
-# save, exit, exit
+# Turn DOCKER_TLS to "no"
+# esc, :wq, enter, "exit"
 # >docker-machine restart
 
 rm -rf dist

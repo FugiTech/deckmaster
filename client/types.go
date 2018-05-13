@@ -33,6 +33,7 @@ type Message struct {
 
 type GREMessage struct {
 	Type             string
+	SystemSeatIDs    []int
 	GameStateMessage struct {
 		Type  string
 		Zones []struct {
@@ -41,6 +42,9 @@ type GREMessage struct {
 		}
 		GameObjects            []GameObject
 		DiffDeletedInstanceIDs []int
+		GameInfo               struct {
+			Stage string
+		}
 	}
 }
 

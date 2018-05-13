@@ -1,5 +1,5 @@
 <template>
-  <div class="zone" :style="{opacity: visible ? 100 : 0 }" @mouseover="visible = true" @mouseout="visible = false">
+  <div class="zone" :style="{opacity: visible && cards.length ? 100 : 0 }" @mouseover="visible = true" @mouseout="visible = false">
     <img class="card" @mouseover="$emit('input', card)" @mouseout="$emit('input', null)" v-for="(card, idx) in cards" :key="idx" :src="cardSrc(card)" :style="cardStyle" />
   </div>
 </template>

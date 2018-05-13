@@ -31,8 +31,14 @@ let store = new Vuex.Store({
   actions: {},
 })
 
+let delay = 0
+window.Twitch.ext.onContext((context, diffProps) => {
+  delay = context.hlsLatencyBroadcaster * 1000
+})
 window.Twitch.ext.listen('broadcast', (target, contentType, message) => {
-  store.commit('setGamestate', JSON.parse(message))
+  setTimeout(() => {
+    store.commit('setGamestate', JSON.parse(message))
+  }, delay)
 })
 
 export default store

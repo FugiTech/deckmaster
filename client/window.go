@@ -13,12 +13,11 @@ var ErrWindowClosed = errors.New("window closed")
 
 func (svc *service) window() error {
 	window := webview.New(webview.Settings{
-		Title:                  "Deckmaster: MTG Arena Overlay",
-		URL:                    "http://localhost:22223?" + strconv.Itoa(int(time.Now().Unix())),
-		Width:                  400,
-		Height:                 200,
-		Resizable:              false,
-		ExternalInvokeCallback: svc.invokeCallback,
+		Title:     "Deckmaster: MTG Arena Overlay",
+		URL:       "http://localhost:22223?" + strconv.Itoa(int(time.Now().Unix())),
+		Width:     400,
+		Height:    200,
+		Resizable: false,
 	})
 	if window == nil {
 		return errors.New("Failed to create window")
@@ -38,8 +37,4 @@ func (svc *service) window() error {
 	window.Run()
 	running.Store(false)
 	return ErrWindowClosed
-}
-
-func (svc *service) invokeCallback(w webview.WebView, data string) {
-	svc.logger.Println(data)
 }
