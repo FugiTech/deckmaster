@@ -18,6 +18,7 @@ func (svc *service) parser() error {
 		buf.ReadFrom(&svc.pipe)
 		_, err := buf.ReadBytes('{')
 		if err != nil {
+			svc.logger.Println("ReadBytes error:", err)
 			time.Sleep(1 * time.Second)
 			continue
 		}
@@ -27,8 +28,7 @@ func (svc *service) parser() error {
 		dec := json.NewDecoder(&buf)
 		err = dec.Decode(&m)
 		if err != nil {
-			svc.logger.Println("JSON decode error:", err)
-			return err
+			time.Sleep(1 * time.Second)
 		}
 
 		for _, mes := range m.GREToClientEvent.GREToClientMessages {

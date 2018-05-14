@@ -85,18 +85,24 @@ type Message struct {
 
 type GREMessage struct {
 	Type             string
+	SystemSeatIDs    []int
 	GameStateMessage struct {
 		Type  string
 		Zones []struct {
 			ZoneID            int
 			ObjectInstanceIDs []int
 		}
-		GameObjects []struct {
-			InstanceID       int
-			GrpID            int
-			ControllerSeatID int
-			CardTypes        []string
-		}
+		GameObjects            []GameObject
 		DiffDeletedInstanceIDs []int
+		GameInfo               struct {
+			Stage string
+		}
 	}
+}
+
+type GameObject struct {
+	InstanceID       int
+	GrpID            int
+	ControllerSeatID int
+	CardTypes        []string
 }

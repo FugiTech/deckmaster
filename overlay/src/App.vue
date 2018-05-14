@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div id="deckmaster" @mouseover="showDeckmaster = true" @mouseout="showDeckmaster = false">
-      <img src="./assets/deckmaster.jpg" />
+      <img id="logo" src="https://deckmaster.fugi.io/logo.png" />
       <template v-if="showDeckmaster">
         <div class="link" @click="globalHide = !globalHide">
           <template v-if="globalHide">Enable interactive elements</template>
@@ -116,6 +116,10 @@ html, body, #app {
 
 .card {
   border-radius: 5%;
+}
+
+#logo {
+  height: 50px;
 }
 
 #deckmaster {

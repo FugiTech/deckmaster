@@ -26,6 +26,7 @@ cd dist/twitch && zip -r ../twitch.zip * && cd ../..
 
 # Build netlify bundle
 cp -r cards dist/netlify/cards
+cp logo.png dist/netlify
 
 cd client_ui && yarn build && cd ..
 go get github.com/rakyll/statik
