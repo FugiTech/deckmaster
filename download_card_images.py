@@ -17,7 +17,10 @@ all_mtga_cards = set.Pool.from_sets("mtga_cards",
 import sys, os, time
 sys.path.append("./mtga_tracker")
 from util import all_mtga_cards
+from app.models.card import Card
 from urllib.request import urlretrieve
+
+all_mtga_cards.cards.append(Card("warrior_token", "Warrior Token", [], [], "Token Creature", "", "TAKH", 17, 66580))
 
 for card in all_mtga_cards.cards:
     if card.set_number < 0:

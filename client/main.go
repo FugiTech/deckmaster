@@ -16,6 +16,8 @@ import (
 var tokenFilename = filepath.Join(os.Getenv("APPDATA"), "Deckmaster", "token.txt")
 
 func main() {
+	autoUpdate()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

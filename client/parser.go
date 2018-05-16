@@ -18,7 +18,6 @@ func (svc *service) parser() error {
 		buf.ReadFrom(&svc.pipe)
 		_, err := buf.ReadBytes('{')
 		if err != nil {
-			svc.logger.Println("ReadBytes error:", err)
 			time.Sleep(1 * time.Second)
 			continue
 		}
