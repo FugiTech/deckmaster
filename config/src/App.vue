@@ -22,7 +22,7 @@
                     The Deckmaster client does not interact with Arena directly in any way.
                     It only reads a log file that Arena produces, so it is safe to use.
                     <br><br>
-                    <v-btn large color="primary" href="https://deckmaster.fugi.io/deckmaster-windows-4.0-amd64.exe">Download Windows client</v-btn>
+                    <v-btn large color="primary" href="https://deckmaster.fugi.io/deckmaster-windows-4.0-amd64.exe" target="_blank">Download Windows client</v-btn>
                     <br><br>
                     When the download is complete please start the client and proceed to the next step.
                   </v-card>
