@@ -31,21 +31,23 @@
                 <v-stepper-content step="2">
                   <v-card flat class="text-xs-center">
                     The client requires an authorization token from Twitch to publish the game state to your viewers.
-                    Normally this token would be passed to the client from the extension panel on your dashboard, but for now we'll pass it from this page.
-                    This should progress automatically, and if everything goes well you can proceed when the button unlocks.
-                    If anything goes wrong make sure the client is running and press retry.
-                    If it continues to fail please contact me at either <a href="https://twitter.com/fugiman">twitter.com/fugiman</a> or fugi@fugiman.com
+                    To pass the token from this page to the client you'll need to press the "Authorize Client" button below.
+                    This configuration wizard can't actually detect if the token is passed successfully, so please double check the Deckmaster client.
+                    If you encounter difficulties please contact me at either <a href="https://twitter.com/fugiman" target="_blank">twitter.com/fugiman</a> or fugi@fugiman.com
 
                     <v-stepper alt-labels v-model="authStep" class="mx-5 my-3">
                       <v-stepper-header>
                         <v-stepper-step :complete="authStep > 1" step="1">Fetch Twitch token</v-stepper-step>
                         <v-divider></v-divider>
-                        <v-stepper-step :rules="[() => !authError]" :complete="authStep > 2" step="2">Pass token to Client</v-stepper-step>
+                        <v-stepper-step :rules="[() => !authError]" :complete="authStep > 2" step="2">Upgrade token</v-stepper-step>
+                        <v-divider></v-divider>
+                        <v-stepper-step :complete="authStep > 3" step="3">Pass token to Client</v-stepper-step>
                       </v-stepper-header>
                     </v-stepper>
                   </v-card>
-                  <v-btn dark color="red" @click.native="sendAuth" v-show="authError">Retry</v-btn>
-                  <v-btn color="primary" @click.native="step = 3" :disabled="authStep < 3">Continue</v-btn>
+                  <v-btn dark color="red" @click.native="upgradeAuth" v-show="authError">Retry</v-btn>
+                  <v-btn color="primary" @click.native="authStep = 4" v-show="authStep >= 3" :href="authURL" target="_blank">Authorize Client</v-btn>
+                  <v-btn color="primary" @click.native="step = 3" :disabled="authStep < 4">Continue</v-btn>
                 </v-stepper-content>
                 <v-stepper-content step="3">
                   <v-card flat class="text-xs-center mb-2">
@@ -54,7 +56,7 @@
                     Otherwise check the Deckmaster client to see if it's reporting any issues, and try restarting it.
                     If the client displays an error that the token is out of date you can use the "Resend Auth Token" button to refresh it.
                   </v-card>
-                  <v-btn @click.native="sendAuth">Resend Auth Token</v-btn>
+                  <v-btn :href="authURL" target="_blank">Resend Auth Token</v-btn>
                   <v-btn color="primary" @click.native="step = 4" :disabled="!arenaWorks">Continue</v-btn>
                   <v-btn dark color="red" @click.native="step = 4">Skip</v-btn>
                 </v-stepper-content>
@@ -62,7 +64,7 @@
                   <v-card flat class="text-xs-center mb-2">
                     That's it, everything should work!
                     <br><br>
-                    Remember to keep the dashboard panel open and set to Deckmaster while streaming to ensure the client continues to work.
+                    If you ever have issues, feel free to reach out to me on Twitter (@Fugiman), Twitch (Fugi), or via email at fugi@fugiman.com!
                   </v-card>
                 </v-stepper-content>
               </v-stepper-items>
@@ -95,28 +97,41 @@ export default {
       authStep: 1,
       authError: false,
       arenaWorks: false,
+      upgradedToken: null,
     }
+  },
+  computed: {
+    authURL() {
+      return 'http://localhost:22223/auth?token=' + this.upgradedToken
+    },
   },
   mounted() {
     tokenPromise.then(() => {
       this.authStep = 2
-      this.sendAuth()
+      this.upgradeAuth()
     })
     pubsubPromise.then(() => {
       this.arenaWorks = true
     })
   },
   methods: {
-    sendAuth() {
-      this.authError = false
-      let i = new Image()
-      i.onerror = () => {
-        this.authError = true
-      }
-      i.onload = () => {
-        this.authStep = 3
-      }
-      i.src = `http://localhost:22223/auth?token=${token}`
+    upgradeAuth() {
+      fetch('https://deckmaster-api.fugi.io/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        body: `token=${token}`,
+      })
+        .then(r => {
+          if (!r.ok) throw new Error('fetch failed')
+          return r.text()
+        })
+        .then(b => {
+          this.upgradedToken = b
+          this.authStep = 3
+        })
+        .catch(() => {
+          this.authError = true
+        })
     },
   },
 }

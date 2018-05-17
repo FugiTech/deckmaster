@@ -11,7 +11,7 @@
       </div>
       <div id="spacer"></div>
       <div id="help" v-show="!$store.getters.healthy">
-        Make sure you have your twitch dashboard loaded with the extension panel open and set to Deckmaster.
+        If you're unable to fix the issue, please contact me on Twitter (@Fugiman) or by email (fugi@fugiman.com).
       </div>
       <div id="version">
         Version {{ $store.state.version.toUpperCase() }}
