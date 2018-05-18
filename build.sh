@@ -36,7 +36,8 @@ VERSION=`git rev-parse --short HEAD`
 echo "package main\n\nconst VERSION = \"$VERSION\"" > client/version.go
 echo $VERSION > dist/netlify/version
 
-go get github.com/karalabe/xgo
 export DOCKER_HOST=192.168.99.100:2376
 export GOPATH=/c/Users/fugi_000/go
+go get github.com/karalabe/xgo
+
 xgo --targets=windows/amd64 -ldflags="-H windowsgui" -out deckmaster -dest /c/Users/fugi_000/go/src/github.com/fugiman/deckmaster/dist/netlify ./client
