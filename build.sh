@@ -1,3 +1,4 @@
+#!/bin/bash
 # This script assumes you've run `python download_card_images.py` already
 # So do that first if you haven't
 
