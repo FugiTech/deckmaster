@@ -20,3 +20,4 @@ client/statik/
 client/version.go
 Thumbs.db
 *.lock
+go/
