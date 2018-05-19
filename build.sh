@@ -11,7 +11,7 @@
 # esc, :wq, enter, "exit"
 # >docker-machine restart
 
-CWD=$(pwd)
+export CWD=$(pwd)
 rm -rf dist
 mkdir dist
 mkdir dist/twitch
