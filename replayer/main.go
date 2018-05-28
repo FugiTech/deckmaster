@@ -4,14 +4,27 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"flag"
+	"fmt"
 	"io"
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
+
+	dmTypes "github.com/fugiman/deckmaster/client/types"
 )
 
+var inputFile = flag.String("f", "", "Input file to replay")
+
 func main() {
-	f, err := os.Open("test_log.txt")
+	flag.Parse()
+	if *inputFile == "" {
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
+	f, err := os.Open(*inputFile)
 	if err != nil {
 		log.Println("input err", err)
 		return
@@ -36,7 +49,7 @@ func main() {
 	// restore the echoing state when exiting
 	defer exec.Command("stty", "-F", "/dev/tty", "echo").Run()
 
-	var messages []*GREMessage
+	var messages []interface{}
 
 	var buf bytes.Buffer
 	for {
@@ -47,7 +60,7 @@ func main() {
 		}
 		buf.UnreadByte()
 
-		var m Message
+		var m dmTypes.Message
 		dec := json.NewDecoder(&buf)
 		err = dec.Decode(&m)
 		if err != nil {
@@ -61,6 +74,31 @@ func main() {
 			}
 		}
 
+		for _, mes := range m.GREToClientEvent.GREToClientMessages {
+			if mes.Type == "GREMessageType_GameStateMessage" ||
+				mes.Type == "GREMessageType_IntermissionReq" {
+				messages = append(messages, mes)
+			}
+		}
+		if m.DraftPack != nil || m.PickedCards != nil {
+			var (
+				draftPack   []int
+				pickedCards []int
+			)
+			for _, c := range m.DraftPack {
+				cc, _ := strconv.Atoi(c)
+				draftPack = append(draftPack, cc)
+			}
+			for _, c := range m.PickedCards {
+				cc, _ := strconv.Atoi(c)
+				pickedCards = append(pickedCards, cc)
+			}
+			messages = append(messages, &dmTypes.DraftMessage{
+				DraftPack:   draftPack,
+				PickedCards: pickedCards,
+			})
+		}
+
 		var newBuf bytes.Buffer
 		newBuf.ReadFrom(dec.Buffered())
 		newBuf.ReadFrom(&buf)
@@ -71,38 +109,18 @@ func main() {
 	enc := json.NewEncoder(output)
 	for _, m := range messages {
 		os.Stdin.Read(userInput)
-		msg := &Message{}
-		msg.GREToClientEvent.GREToClientMessages = []*GREMessage{m}
+		msg := &dmTypes.Message{}
+		switch m := m.(type) {
+		case *dmTypes.GREMessage:
+			msg.GREToClientEvent.GREToClientMessages = []*dmTypes.GREMessage{m}
+		case *dmTypes.DraftMessage:
+			for _, c := range m.DraftPack {
+				msg.DraftPack = append(msg.DraftPack, fmt.Sprint(c))
+			}
+			for _, c := range m.PickedCards {
+				msg.PickedCards = append(msg.PickedCards, fmt.Sprint(c))
+			}
+		}
 		enc.Encode(msg)
 	}
-}
-
-type Message struct {
-	GREToClientEvent struct {
-		GREToClientMessages []*GREMessage
-	}
-}
-
-type GREMessage struct {
-	Type             string
-	SystemSeatIDs    []int
-	GameStateMessage struct {
-		Type  string
-		Zones []struct {
-			ZoneID            int
-			ObjectInstanceIDs []int
-		}
-		GameObjects            []GameObject
-		DiffDeletedInstanceIDs []int
-		GameInfo               struct {
-			Stage string
-		}
-	}
-}
-
-type GameObject struct {
-	InstanceID       int
-	GrpID            int
-	ControllerSeatID int
-	CardTypes        []string
 }

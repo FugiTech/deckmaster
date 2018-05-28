@@ -5,27 +5,29 @@ Vue.use(Vuex)
 
 let store = new Vuex.Store({
   state: {
-    game: {
-      PlayerHand: [],
-      PlayerLands: [],
-      PlayerCreatures: [],
-      PlayerPermanents: [],
-      OpponentHand: [],
-      OpponentLands: [],
-      OpponentCreatures: [],
-      OpponentPermanents: [],
-    },
+    focusCard: null,
+    activeTrigger: null,
+    zones: [],
+    triggers: [],
+    activeDeck: '',
+    doubleSided: {},
   },
   mutations: {
-    setGamestate(state, gamestate) {
-      state.game.PlayerHand = gamestate.PlayerHand || []
-      state.game.PlayerLands = gamestate.PlayerLands || []
-      state.game.PlayerCreatures = gamestate.PlayerCreatures || []
-      state.game.PlayerPermanents = gamestate.PlayerPermanents || []
-      state.game.OpponentHand = gamestate.OpponentHand || []
-      state.game.OpponentLands = gamestate.OpponentLands || []
-      state.game.OpponentCreatures = gamestate.OpponentCreatures || []
-      state.game.OpponentPermanents = gamestate.OpponentPermanents || []
+    handleBroadcast(state, data) {
+      state.zones = data.Zones || []
+      state.triggers = data.Triggers || []
+      state.activeDeck = data.ActiveDeck || ''
+      state.doubleSided = data.DoubleSided || {}
+      if (data.Reset) {
+        state.focusCard = null
+        state.activeTrigger = null
+      }
+    },
+    setFocusCard(state, card) {
+      state.focusCard = card
+    },
+    setActiveTrigger(state, t) {
+      state.activeTrigger = t
     },
   },
   actions: {},
@@ -37,7 +39,7 @@ window.Twitch.ext.onContext((context, diffProps) => {
 })
 window.Twitch.ext.listen('broadcast', (target, contentType, message) => {
   setTimeout(() => {
-    store.commit('setGamestate', JSON.parse(message))
+    store.commit('handleBroadcast', JSON.parse(message))
   }, delay)
 })
 

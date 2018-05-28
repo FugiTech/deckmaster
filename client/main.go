@@ -2,18 +2,34 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime/pprof"
+	"sync"
+	"sync/atomic"
 	"time"
 
+	. "github.com/fugiman/deckmaster/client/types"
 	"golang.org/x/sync/errgroup"
 )
 
 var tokenFilename = filepath.Join(os.Getenv("APPDATA"), "Deckmaster", "token.txt")
+
+type service struct {
+	ctx             context.Context
+	logger          *log.Logger
+	globalGameState atomic.Value
+	token           atomic.Value
+	pipe            bytes.Buffer
+	pipeLock        sync.Mutex
+	messageChannel  chan interface{}
+	pubsubStatus    atomic.Value
+	arenaStatus     atomic.Value
+}
 
 func main() {
 	autoUpdate()
@@ -52,7 +68,7 @@ func main() {
 	svc := &service{
 		ctx:            ctx,
 		logger:         logger,
-		messageChannel: make(chan *GREMessage, 100),
+		messageChannel: make(chan interface{}, 100),
 	}
 	svc.token.Store(token)
 

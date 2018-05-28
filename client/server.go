@@ -13,6 +13,7 @@ import (
 	_ "net/http/pprof"
 
 	_ "github.com/fugiman/deckmaster/client/statik"
+	. "github.com/fugiman/deckmaster/client/types"
 	"github.com/rakyll/statik/fs"
 )
 
