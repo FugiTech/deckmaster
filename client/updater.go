@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"sort"
+	"strconv"
 	"time"
 
 	. "github.com/fugiman/deckmaster/client/types"
@@ -17,8 +19,6 @@ func (svc *service) updater() error {
 		switch m := m.(type) {
 		case *GREMessage:
 			if m.GameStateMessage.Type == "GameStateType_Full" {
-				gameState = BroadcastMessage{}
-				gameObjects = map[int]GameObject{}
 				seatID = m.SystemSeatIDs[0]
 			}
 
@@ -116,6 +116,15 @@ func (svc *service) updater() error {
 			if m.DraftPack == nil {
 				gameState.PickedCards = nil
 			}
+
+		case *DeckMessage:
+			var b bytes.Buffer
+			for _, v := range m.MainDeck {
+				id, _ := strconv.Atoi(v.ID)
+				c := AllCards[id]
+				fmt.Fprintf(&b, "%d %s (%s) %d\n", v.Quantity, c.Name, c.Set, c.SetNum)
+			}
+			gameState.ActiveDeck = b.String()
 		}
 
 		gameState.Zones = []Zone{
@@ -138,9 +147,9 @@ func (svc *service) updater() error {
 			Zone{Vert: true, Cards: gameState.PickedCards, X: "78.5%", Y: "16%", H: "74%", W: "21%"},
 		}
 		for idx, card := range gameState.DraftPack {
-			gameState.Zones = append(gameState.Zones, Zone{Cards: []int{card}, H: "25%", W: "10.5%",
-				X: fmt.Sprintf("%0.1f%%", 15.0+(10.5*float64(idx%5))),
-				Y: fmt.Sprintf("%0.1f%%", 18.5+(26.0*float64(idx/5))),
+			gameState.Zones = append(gameState.Zones, Zone{Cards: []int{card}, H: "26%", W: "11%",
+				X: fmt.Sprintf("%0.1f%%", 14.8+(10.5*float64(idx%5))),
+				Y: fmt.Sprintf("%0.1f%%", 18.2+(26.0*float64(idx/5))),
 			})
 		}
 		gameState.Triggers = []Trigger{

@@ -17,6 +17,8 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+const ClientID = "cplheah4pxjyuwe9mkno9kbmb11lyc"
+
 var tokenFilename = filepath.Join(os.Getenv("APPDATA"), "Deckmaster", "token.txt")
 
 type service struct {
@@ -29,6 +31,8 @@ type service struct {
 	messageChannel  chan interface{}
 	pubsubStatus    atomic.Value
 	arenaStatus     atomic.Value
+	voting          atomic.Value
+	tokenCh         chan Token
 }
 
 func main() {
@@ -69,14 +73,17 @@ func main() {
 		ctx:            ctx,
 		logger:         logger,
 		messageChannel: make(chan interface{}, 100),
+		tokenCh:        make(chan Token, 10),
 	}
 	svc.token.Store(token)
+	svc.tokenCh <- token
 
 	eg.Go(svc.server)
 	eg.Go(svc.tail)
 	eg.Go(svc.parser)
 	eg.Go(svc.updater)
 	eg.Go(svc.publisher)
+	eg.Go(svc.pubsublistener)
 
 	if werr := svc.window(); werr != nil {
 		cancel()

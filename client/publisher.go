@@ -57,7 +57,7 @@ func (svc *service) publish() string {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Client-ID", "cplheah4pxjyuwe9mkno9kbmb11lyc")
+	req.Header.Set("Client-ID", ClientID)
 	req.Header.Set("Authorization", "Bearer "+token.JWT)
 
 	resp, err := http.DefaultClient.Do(req)

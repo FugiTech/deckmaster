@@ -26,9 +26,10 @@ func (svc *service) server() error {
 	http.Handle("/", http.FileServer(statikFS))
 
 	http.HandleFunc("/auth", func(w http.ResponseWriter, r *http.Request) {
-		token := r.FormValue("token")
-		svc.token.Store(parseToken(token))
-		ioutil.WriteFile(tokenFilename, []byte(token), 0664)
+		token := parseToken(r.FormValue("token"))
+		svc.token.Store(token)
+		svc.tokenCh <- token
+		ioutil.WriteFile(tokenFilename, []byte(r.FormValue("token")), 0664)
 		fmt.Fprint(w, "<!doctype html><script>window.close()</script>")
 	})
 
@@ -39,6 +40,7 @@ func (svc *service) server() error {
 				"Twitch": svc.pubsubStatus.Load(),
 				"Arena":  svc.arenaStatus.Load(),
 			},
+			"voting": svc.voting.Load(),
 		})
 	})
 

@@ -98,6 +98,9 @@ func main() {
 				PickedCards: pickedCards,
 			})
 		}
+		if m.CourseDeck != nil {
+			messages = append(messages, m.CourseDeck)
+		}
 
 		var newBuf bytes.Buffer
 		newBuf.ReadFrom(dec.Buffered())
@@ -120,6 +123,8 @@ func main() {
 			for _, c := range m.PickedCards {
 				msg.PickedCards = append(msg.PickedCards, fmt.Sprint(c))
 			}
+		case *dmTypes.DeckMessage:
+			msg.CourseDeck = m
 		}
 		enc.Encode(msg)
 	}

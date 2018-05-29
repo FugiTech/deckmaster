@@ -21,11 +21,11 @@ func (svc *service) parser() error {
 			return svc.ctx.Err()
 		}
 
-		delay := time.Since(lastRead)
-		if delay > 30*time.Second {
+		delay := time.Since(lastRead).Truncate(time.Second)
+		if delay >= 30*time.Second {
 			svc.arenaStatus.Store(fmt.Sprintf("Log file hasn't updated in %s", delay))
 		} else {
-			svc.arenaStatus.Store(nil)
+			svc.arenaStatus.Store("")
 		}
 
 		svc.pipeLock.Lock()
@@ -69,6 +69,9 @@ func (svc *service) parser() error {
 				DraftPack:   draftPack,
 				PickedCards: pickedCards,
 			}
+		}
+		if m.CourseDeck != nil {
+			svc.messageChannel <- m.CourseDeck
 		}
 
 		var newBuf bytes.Buffer

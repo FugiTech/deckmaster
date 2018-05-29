@@ -5,7 +5,7 @@
       <a class="close" @click="$store.commit('setActiveTrigger', null)">close</a>
     </div>
     <div class="inner-zone" :style="{ visibility: visible ? 'visible' : 'hidden'}">
-      <img class="card" @mouseover="$emit('input', card)" @mouseout="$emit('input', null)" v-for="(card, idx) in d.Cards" :key="idx" :src="cardSrc(card)" :style="cardStyle" />
+      <img class="card" @click="clicked(card)" @mouseover="$emit('input', card)" @mouseout="$emit('input', null)" v-for="(card, idx) in d.Cards" :key="idx" :src="cardSrc(card)" :style="cardStyle" />
     </div>
   </div>
 </template>
@@ -47,6 +47,11 @@ export default {
           }
     },
   },
+  methods: {
+    clicked(card) {
+      this.$store.dispatch('send', { card })
+    },
+  },
 }
 </script>
 
@@ -58,6 +63,7 @@ export default {
   text-align: center;
   color: white;
   transition: opacity 0.1s;
+  padding: 5px;
 }
 .zone.vert {
   overflow-y: auto;
@@ -88,11 +94,15 @@ img {
   text-decoration: underline;
 }
 
+.card:hover {
+  cursor: pointer;
+  box-shadow: 0 0 6px 2px #0ff;
+}
+
 ::-webkit-scrollbar {
   background: transparent;
   width: 0.5vw;
 }
-
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.5);
 }

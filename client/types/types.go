@@ -18,6 +18,8 @@ type Message struct {
 	// Used when drafting
 	DraftPack   []string
 	PickedCards []string
+	// Used for detecting active deck
+	CourseDeck *DeckMessage
 }
 
 type GREMessage struct {
@@ -40,6 +42,15 @@ type GREMessage struct {
 type DraftMessage struct {
 	DraftPack   []int
 	PickedCards []int
+}
+
+type DeckMessage struct {
+	Name       string
+	DeckTileID int // Card ID for the cover of the deck
+	MainDeck   []struct {
+		ID       string
+		Quantity int
+	}
 }
 
 type GameObject struct {
@@ -101,6 +112,8 @@ type Trigger struct {
 type Card struct {
 	ID       string
 	Name     string
+	Set      string
+	SetNum   int
 	Colors   []string
 	Rarity   string
 	TwoSided bool

@@ -9,5 +9,5 @@ with open('cards.txt', newline='') as f:
     for [id, set, setnum] in r:
         r = requests.get("https://api.scryfall.com/cards/{}/{}".format(set.lower(), setnum))
         d = r.json()
-        print('{}: Card{{ "{}", "{}", []string{{ {} }}, "{}", {}, {:0.0f} }},'.format(id, id, d["name"], ",".join(['"{}"'.format(v) for v in d["color_identity"]]), d["rarity"], "false" if d["layout"] == "normal" else "true", d["cmc"] ))
+        print('{}: Card{{ "{}", "{}", "{}", {}, []string{{ {} }}, "{}", {}, {:0.0f} }},'.format(id, id, d["name"], set, setnum, ",".join(['"{}"'.format(v) for v in d["color_identity"]]), d["rarity"], "false" if d["layout"] == "normal" else "true", d["cmc"] ))
 print("}")

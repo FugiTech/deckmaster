@@ -16,7 +16,7 @@ func (svc *service) window() error {
 		Title:     "Deckmaster: MTG Arena Overlay",
 		URL:       "http://localhost:22223?" + strconv.Itoa(int(time.Now().Unix())),
 		Width:     400,
-		Height:    200,
+		Height:    400,
 		Resizable: false,
 	})
 	if window == nil {

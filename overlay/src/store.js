@@ -3,6 +3,8 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+let send = d => {}
+
 let store = new Vuex.Store({
   state: {
     focusCard: null,
@@ -30,12 +32,31 @@ let store = new Vuex.Store({
       state.activeTrigger = t
     },
   },
-  actions: {},
+  actions: {
+    send(context, v) {
+      send(v)
+    },
+  },
 })
 
 let delay = 0
 window.Twitch.ext.onContext((context, diffProps) => {
   delay = context.hlsLatencyBroadcaster * 1000
+})
+window.Twitch.ext.onAuthorized(data => {
+  send = d => {
+    window.Twitch.ext.send(
+      `whisper-U${data.channelId}`,
+      'application/json',
+      JSON.stringify({
+        UserID: data.userId,
+        Data: d,
+      }),
+    )
+  }
+  window.Twitch.ext.listen(`whisper-${data.userId}`, (target, contentType, message) => {
+    console.log(target, contentType, message)
+  })
 })
 window.Twitch.ext.listen('broadcast', (target, contentType, message) => {
   setTimeout(() => {
