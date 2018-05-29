@@ -16,6 +16,8 @@ func (svc *service) updater() error {
 	seatID := 0
 
 	for m := range svc.messageChannel {
+		gameState.Reset = false
+
 		switch m := m.(type) {
 		case *GREMessage:
 			if m.GameStateMessage.Type == "GameStateType_Full" {
