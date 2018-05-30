@@ -63,6 +63,11 @@ app.post('/vote', (req, res) => {
 
   if (!votes.has(token.channel_id)) votes.set(token.channel_id, new Map())
   let cdata = votes.get(token.channel_id)
+
+  for (let [card, users] of cdata) {
+    users.delete(token.opaque_user_id)
+  }
+
   if (!cdata.has(req.body.card)) cdata.set(req.body.card, new Map())
   cdata.get(req.body.card).set(token.opaque_user_id, new Date())
 
