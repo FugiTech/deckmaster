@@ -83,7 +83,7 @@ func main() {
 	eg.Go(svc.parser)
 	eg.Go(svc.updater)
 	eg.Go(svc.publisher)
-	eg.Go(svc.pubsublistener)
+	eg.Go(svc.votingLoop)
 
 	if werr := svc.window(); werr != nil {
 		cancel()

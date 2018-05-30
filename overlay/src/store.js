@@ -3,7 +3,10 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-let send = d => {}
+let token
+window.Twitch.ext.onAuthorized(data => {
+  token = data.token
+})
 
 let store = new Vuex.Store({
   state: {
@@ -33,8 +36,12 @@ let store = new Vuex.Store({
     },
   },
   actions: {
-    send(context, v) {
-      send(v)
+    vote(context, card) {
+      fetch('https://deckmaster-api.fugi.io/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        body: `token=${token}&card=${card}`,
+      })
     },
   },
 })
@@ -42,21 +49,6 @@ let store = new Vuex.Store({
 let delay = 0
 window.Twitch.ext.onContext((context, diffProps) => {
   delay = context.hlsLatencyBroadcaster * 1000
-})
-window.Twitch.ext.onAuthorized(data => {
-  send = d => {
-    window.Twitch.ext.send(
-      `whisper-U${data.channelId}`,
-      'application/json',
-      JSON.stringify({
-        UserID: data.userId,
-        Data: d,
-      }),
-    )
-  }
-  window.Twitch.ext.listen(`whisper-${data.userId}`, (target, contentType, message) => {
-    console.log(target, contentType, message)
-  })
 })
 window.Twitch.ext.listen('broadcast', (target, contentType, message) => {
   setTimeout(() => {

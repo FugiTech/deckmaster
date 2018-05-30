@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     clicked(card) {
-      this.$store.dispatch('send', { card })
+      this.$store.dispatch('vote', card)
     },
   },
 }
