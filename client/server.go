@@ -63,7 +63,7 @@ func parseToken(token string) Token {
 		return t
 	}
 
-	d, err := base64.URLEncoding.DecodeString(p[1])
+	d, err := base64.RawURLEncoding.DecodeString(p[1])
 	if err != nil {
 		return t
 	}
