@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+
+	. "github.com/fugiman/deckmaster/client/types"
 )
 
 func (svc *service) publisher() error {
@@ -30,14 +32,9 @@ func (svc *service) publish() string {
 		return "Token has expired"
 	}
 
-	gs, ok := svc.globalGameState.Load().(GameState)
+	gs, ok := svc.globalGameState.Load().(BroadcastMessage)
 	if !ok {
-		return "Unable to read gamestate"
-	}
-	if time.Since(gs.updatedAt) > 20*time.Second {
-		if msg, _ := svc.arenaStatus.Load().(string); msg == "" {
-			svc.arenaStatus.Store("Game state not changing")
-		}
+		return ""
 	}
 
 	data, err := json.Marshal(gs)
@@ -60,12 +57,12 @@ func (svc *service) publish() string {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Client-ID", "cplheah4pxjyuwe9mkno9kbmb11lyc")
+	req.Header.Set("Client-ID", ClientID)
 	req.Header.Set("Authorization", "Bearer "+token.JWT)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil || resp.StatusCode != 204 {
-		return "HTTP request failed"
+		return "Publish request failed"
 	}
 
 	return ""

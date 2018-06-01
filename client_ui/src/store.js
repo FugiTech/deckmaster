@@ -7,6 +7,7 @@ let s = new Vuex.Store({
   state: {
     version: '------',
     status: {},
+    voting: [],
   },
   getters: {
     healthy(state) {
@@ -23,6 +24,9 @@ let s = new Vuex.Store({
     version(state, version) {
       state.version = version
     },
+    voting(state, voting) {
+      state.voting = voting || []
+    },
   },
   actions: {},
 })
@@ -35,6 +39,6 @@ let update = async function() {
   for (let [k, v] of Object.entries(d)) s.commit(k, v)
 }
 update()
-setInterval(update, 5000)
+setInterval(update, 1000)
 
 export default s

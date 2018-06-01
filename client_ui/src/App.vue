@@ -9,7 +9,12 @@
         <strong>{{ name }}</strong>
         <em>{{ status }}</em>
       </div>
-      <div id="spacer"></div>
+      <div class="spacer"></div>
+      <div class="voting" v-for="(data, idx) in $store.state.voting.slice(0,5)" v-if="data.Votes" :key="idx">
+        <strong>{{ data.Votes }}</strong>
+        <span>{{ data.Name }}</span>
+      </div>
+      <div class="spacer"></div>
       <div id="help" v-show="!$store.getters.healthy">
         If you're unable to fix the issue, please contact me on Twitter (@Fugiman) or by email (fugi@fugiman.com).
       </div>
@@ -40,58 +45,48 @@ export default {
 
 <style>
 @font-face {
-    font-family: 'Montserrat';
-    src: url('./assets/Montserrat-Light.eot');
-    src: local('Montserrat Light'), local('Montserrat-Light'),
-        url('./assets/Montserrat-Light.eot?#iefix') format('embedded-opentype'),
-        url('./assets/Montserrat-Light.woff2') format('woff2'),
-        url('./assets/Montserrat-Light.woff') format('woff'),
-        url('./assets/Montserrat-Light.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
+  font-family: 'Montserrat';
+  src: url('./assets/Montserrat-Light.eot');
+  src: local('Montserrat Light'), local('Montserrat-Light'), url('./assets/Montserrat-Light.eot?#iefix') format('embedded-opentype'), url('./assets/Montserrat-Light.woff2') format('woff2'),
+    url('./assets/Montserrat-Light.woff') format('woff'), url('./assets/Montserrat-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Montserrat';
-    src: url('./assets/Montserrat-Regular.eot');
-    src: local('Montserrat Regular'), local('Montserrat-Regular'),
-        url('./assets/Montserrat-Regular.eot?#iefix') format('embedded-opentype'),
-        url('./assets/Montserrat-Regular.woff2') format('woff2'),
-        url('./assets/Montserrat-Regular.woff') format('woff'),
-        url('./assets/Montserrat-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'Montserrat';
+  src: url('./assets/Montserrat-Regular.eot');
+  src: local('Montserrat Regular'), local('Montserrat-Regular'), url('./assets/Montserrat-Regular.eot?#iefix') format('embedded-opentype'), url('./assets/Montserrat-Regular.woff2') format('woff2'),
+    url('./assets/Montserrat-Regular.woff') format('woff'), url('./assets/Montserrat-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Montserrat';
-    src: url('./assets/Montserrat-Bold.eot');
-    src: local('Montserrat Bold'), local('Montserrat-Bold'),
-        url('./assets/Montserrat-Bold.eot?#iefix') format('embedded-opentype'),
-        url('./assets/Montserrat-Bold.woff2') format('woff2'),
-        url('./assets/Montserrat-Bold.woff') format('woff'),
-        url('./assets/Montserrat-Bold.ttf') format('truetype');
-    font-weight: bold;
-    font-style: normal;
+  font-family: 'Montserrat';
+  src: url('./assets/Montserrat-Bold.eot');
+  src: local('Montserrat Bold'), local('Montserrat-Bold'), url('./assets/Montserrat-Bold.eot?#iefix') format('embedded-opentype'), url('./assets/Montserrat-Bold.woff2') format('woff2'), url('./assets/Montserrat-Bold.woff') format('woff'),
+    url('./assets/Montserrat-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Montserrat';
-    src: url('./assets/Montserrat-Medium.eot');
-    src: local('Montserrat Medium'), local('Montserrat-Medium'),
-        url('./assets/Montserrat-Medium.eot?#iefix') format('embedded-opentype'),
-        url('./assets/Montserrat-Medium.woff2') format('woff2'),
-        url('./assets/Montserrat-Medium.woff') format('woff'),
-        url('./assets/Montserrat-Medium.ttf') format('truetype');
-    font-weight: 500;
-    font-style: normal;
+  font-family: 'Montserrat';
+  src: url('./assets/Montserrat-Medium.eot');
+  src: local('Montserrat Medium'), local('Montserrat-Medium'), url('./assets/Montserrat-Medium.eot?#iefix') format('embedded-opentype'), url('./assets/Montserrat-Medium.woff2') format('woff2'),
+    url('./assets/Montserrat-Medium.woff') format('woff'), url('./assets/Montserrat-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
 }
 
 * {
   box-sizing: border-box;
 }
 
-html, body, #app {
+html,
+body,
+#app {
   height: 100%;
   width: 100%;
   margin: 0;
@@ -105,7 +100,7 @@ html, body, #app {
   font-family: Montserrat, Verdana, Helvetica, Arial, sans-serif;
 }
 #innerApp {
-  height: 200px;
+  height: 400px;
   width: 400px;
   padding: 0 5px;
   display: flex;
@@ -121,7 +116,7 @@ html, body, #app {
 }
 .status {
   width: 320px;
-  flex: auto;
+  margin-bottom: 10px;
 }
 .status span,
 .status strong {
@@ -133,7 +128,18 @@ html, body, #app {
   font-weight: 300;
   font-style: normal;
 }
-#spacer {
+.voting {
+  width: 320px;
+}
+.voting strong {
+  padding-right: 4px;
+  font-size: 20px;
+}
+.voting span {
+  font-size: 18px;
+  font-weight: 300;
+}
+.spacer {
   flex: auto;
 }
 #help {
