@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"io"
 	"os"
 	"path/filepath"
@@ -53,6 +54,13 @@ func (svc *service) tail() error {
 			fi = fi2
 
 			svc.pipeLock.Lock()
+			if svc.pipe.Cap() > 10*1024*1024 { // 10MB
+				var b bytes.Buffer
+				_, err = io.Copy(&b, &svc.pipe)
+				if err == nil {
+					svc.pipe = b
+				}
+			}
 			_, err = io.Copy(&svc.pipe, f)
 			svc.pipeLock.Unlock()
 			if err != nil {

@@ -34,7 +34,7 @@ func main() {
 
 	// logFile := path.Join(os.Getenv("APPDATA"), "..", "LocalLow", "Wizards Of The Coast", "MTGA", "output_log.txt")
 	logFile := "/mnt/c/Users/fugi_000/AppData/LocalLow/Wizards Of The Coast/MTGA/output_log.txt"
-	output, err := os.Create(logFile)
+	output, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Println("output err", err)
 		return

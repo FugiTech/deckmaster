@@ -110,24 +110,21 @@ type Trigger struct {
 }
 
 type Card struct {
-	ID       string
-	Name     string
-	Set      string
-	SetNum   int
-	Colors   []string
-	Rarity   string
-	TwoSided bool
-	CMC      int
+	ID        string
+	Name      string
+	Set       string
+	SetNum    int
+	Colors    string
+	Rarity    string
+	CMC       int
+	DualSided bool
 }
 
 func (c Card) ColorRank() int {
-	if len(c.Colors) == 0 || c.CMC == 0 { // Hacky fix for lands
+	if c.CMC == 0 { // Hacky fix for lands
 		return 0
 	}
-	if len(c.Colors) > 1 {
-		return 1
-	}
-	switch c.Colors[0] {
+	switch c.Colors {
 	case "W":
 		return 7
 	case "U":
@@ -139,6 +136,8 @@ func (c Card) ColorRank() int {
 	case "G":
 		return 3
 	default:
+		return 1
+	case "":
 		return 0
 	}
 }

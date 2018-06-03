@@ -165,7 +165,7 @@ func (svc *service) updater() error {
 		gameState.DoubleSided = map[int]bool{}
 		for _, zone := range gameState.Zones {
 			for _, card := range zone.Cards {
-				if AllCards[card].TwoSided {
+				if AllCards[card].DualSided {
 					gameState.DoubleSided[card] = true
 				}
 			}
