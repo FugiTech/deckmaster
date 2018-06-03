@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <div id="deckmaster" @mouseover="showDeckmaster = true" @mouseout="showDeckmaster = false">
+      <h1 v-if="showDeckmaster">Deckmaster</h1>
       <img id="logo" src="https://deckmaster.fugi.io/logo.png" />
       <template v-if="showDeckmaster">
         <div class="link" @click="globalHide = !globalHide">
@@ -147,7 +148,6 @@ body,
   position: absolute;
   top: 100px;
   right: 0.5%;
-  background: rgba(0, 0, 0, 80%);
   line-height: 0;
   color: white;
   font-size: 0.8em;
@@ -156,10 +156,19 @@ body,
   transition: opacity 0.3s;
 }
 #app:hover #deckmaster {
-  opacity: 0.2;
+  opacity: 0.5;
 }
 #deckmaster:hover {
   opacity: 1 !important;
+  background: rgba(0, 0, 0, 80%);
+}
+#deckmaster h1 {
+  display: inline-block;
+  margin: 0 10px;
+  vertical-align: top;
+  line-height: 50px;
+  font-size: 32px;
+  font-weight: 200;
 }
 #deckmaster div {
   line-height: normal;
@@ -172,15 +181,15 @@ body,
   text-decoration: underline;
 }
 #deckmaster div.small {
-  font-weight: 300;
+  font-weight: 200;
   font-size: 0.8em;
   line-height: 0.8em;
 }
 
 #focusCard {
   position: absolute;
-  top: 5%;
-  height: 70%;
+  top: 100px;
+  height: calc(80% - 100px);
   left: 1%;
   z-index: 100;
   pointer-events: none;

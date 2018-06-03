@@ -82,6 +82,7 @@ export default {
   text-align: center;
   color: white;
   transition: opacity 0.1s;
+  line-height: 0;
 }
 .trigger:hover {
   cursor: pointer;
@@ -96,7 +97,8 @@ export default {
 .name {
   font-weight: 500;
 }
-.help {
-  font-weight: 300;
+.help,
+.count {
+  font-weight: 200;
 }
 </style>

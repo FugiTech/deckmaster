@@ -83,11 +83,10 @@ img {
 
 .name {
   font-size: 20px;
-  font-weight: 500;
 }
 .close {
   font-size: 14px;
-  font-weight: 300;
+  font-weight: 200;
 }
 .close:hover {
   cursor: pointer;
