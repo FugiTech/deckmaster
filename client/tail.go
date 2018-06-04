@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const maxReadSize = 3 * 1024 * 1024
+
 func (svc *service) tail() error {
 	outputLogLocation := filepath.Join(os.Getenv("APPDATA"), "..", "LocalLow", "Wizards Of The Coast", "MTGA", "output_log.txt")
 	svc.logger.Println("Output log location:", outputLogLocation)
@@ -30,6 +32,9 @@ func (svc *service) tail() error {
 			svc.logger.Println("Error statting log file:", err)
 			time.Sleep(5 * time.Second)
 			continue
+		}
+		if fi.Size() > maxReadSize {
+			f.Seek(-maxReadSize, os.SEEK_END)
 		}
 
 		done := make(chan struct{})
@@ -54,7 +59,7 @@ func (svc *service) tail() error {
 			fi = fi2
 
 			svc.pipeLock.Lock()
-			if svc.pipe.Cap() > 10*1024*1024 { // 10MB
+			if svc.pipe.Cap() > maxReadSize {
 				var b bytes.Buffer
 				_, err = io.Copy(&b, &svc.pipe)
 				if err == nil {

@@ -14,6 +14,8 @@ import (
 func (svc *service) parser() error {
 	defer func() { close(svc.messageChannel) }()
 
+	time.Sleep(time.Second)
+
 	lastRead := time.Now()
 	var buf bytes.Buffer
 	for {
