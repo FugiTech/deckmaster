@@ -20,6 +20,8 @@ type Message struct {
 	PickedCards []string
 	// Used for detecting active deck
 	CourseDeck *DeckMessage
+	// Used to detect Arena launching
+	Method string
 }
 
 type GREMessage struct {
@@ -51,6 +53,9 @@ type DeckMessage struct {
 		ID       string
 		Quantity int
 	}
+}
+
+type GameLaunchMessage struct {
 }
 
 type GameObject struct {

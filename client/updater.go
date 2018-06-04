@@ -127,6 +127,11 @@ func (svc *service) updater() error {
 				fmt.Fprintf(&b, "%d %s (%s) %d\n", v.Quantity, c.Name, c.Set, c.SetNum)
 			}
 			gameState.ActiveDeck = b.String()
+
+		case *GameLaunchMessage:
+			gameState = BroadcastMessage{}
+			gameObjects = map[int]GameObject{}
+			gameState.Reset = true
 		}
 
 		gameState.Zones = []Zone{

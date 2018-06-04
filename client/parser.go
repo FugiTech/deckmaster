@@ -75,6 +75,9 @@ func (svc *service) parser() error {
 		if m.CourseDeck != nil {
 			svc.messageChannel <- m.CourseDeck
 		}
+		if m.Method == "Authenticate" {
+			svc.messageChannel <- &GameLaunchMessage{}
+		}
 
 		var newBuf bytes.Buffer
 		newBuf.ReadFrom(dec.Buffered())
