@@ -24,7 +24,6 @@ func autoUpdate() {
 		return
 	}
 	if VERSION == strings.TrimSpace(string(body)) {
-		log.Println(err)
 		return
 	}
 

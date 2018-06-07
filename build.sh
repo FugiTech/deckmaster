@@ -20,7 +20,6 @@ cd config && yarn build && cd ..
 cd overlay && yarn build && cd ..
 mv config/dist dist/twitch/config
 mv overlay/dist dist/twitch/overlay
-cp -r dashboard dist/twitch/dashboard
 
 cd dist/twitch && zip -r ../twitch.zip * && cd ../..
 

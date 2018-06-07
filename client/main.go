@@ -36,7 +36,7 @@ type service struct {
 }
 
 func main() {
-	autoUpdate()
+	// autoUpdate()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -58,16 +58,14 @@ func main() {
 	}
 
 	eg, ctx := errgroup.WithContext(ctx)
-	if os.Getenv("DEBUG") != "" {
-		go func() {
-			<-ctx.Done()
-			time.Sleep(30 * time.Second)
-			logger.Println("Force closing, goroutine stuck")
-			pprof.Lookup("goroutine").WriteTo(logStream, 1)
-			logStream.Flush()
-			os.Exit(1)
-		}()
-	}
+	go func() {
+		<-ctx.Done()
+		time.Sleep(30 * time.Second)
+		logger.Println("Force closing, goroutine stuck")
+		pprof.Lookup("goroutine").WriteTo(logStream, 1)
+		logStream.Flush()
+		os.Exit(1)
+	}()
 
 	svc := &service{
 		ctx:            ctx,
@@ -85,7 +83,9 @@ func main() {
 	eg.Go(svc.publisher)
 	eg.Go(svc.votingLoop)
 
+	log.Println("running svc.window")
 	if werr := svc.window(); werr != nil {
+		log.Println("window error:", werr)
 		cancel()
 	}
 

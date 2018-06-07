@@ -2,24 +2,25 @@ package main
 
 import (
 	"errors"
+	"log"
 	"strconv"
 	"sync/atomic"
 	"time"
 
-	"github.com/zserge/webview"
+	"github.com/fugiman/deckmaster/client/webview"
 )
 
 var ErrWindowClosed = errors.New("window closed")
 
 func (svc *service) window() error {
 	window := webview.New(webview.Settings{
-		Title:     "Deckmaster: MTG Arena Overlay",
-		URL:       "http://localhost:22223?" + strconv.Itoa(int(time.Now().Unix())),
-		Width:     400,
-		Height:    400,
-		Resizable: false,
+		Title:  "Deckmaster: MTG Arena Overlay",
+		URL:    "http://localhost:22223?" + strconv.Itoa(int(time.Now().Unix())),
+		Width:  400,
+		Height: 400,
 	})
 	if window == nil {
+		log.Println("Window failed to create :(")
 		return errors.New("Failed to create window")
 	}
 
@@ -34,7 +35,9 @@ func (svc *service) window() error {
 		}
 	}()
 
+	log.Println("Running window")
 	window.Run()
+	log.Println("window stopped running")
 	running.Store(false)
 	return ErrWindowClosed
 }
