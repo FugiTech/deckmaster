@@ -1,4 +1,4 @@
-import sys, os, io, json, csv
+import sys, os, io, json, csv, zlib
 import requests
 import unitypack
 from urllib.request import urlretrieve
@@ -11,17 +11,17 @@ set_overrides = {
 # Map from Scryfall language code -> Twitch language code
 languages = {
     "en": "en", # English
-    "es": "es", # Spanish
-    "fr": "fr", # French
-    "de": "de", # German
-    "it": "it", # Italian
-    "pt": "pt", # Portuguese
-    "ja": "ja", # Japanese
-    "ko": "ko", # Korean
-    "ru": "ru", # Russian
-    # Twitch just gives us "zh" for both, so just use Simplified
-    "zhs": "zh", # Simplified Chinese
-    #"zht": "zh", # Traditional Chinese
+    # "es": "es", # Spanish
+    # "fr": "fr", # French
+    # "de": "de", # German
+    # "it": "it", # Italian
+    # "pt": "pt", # Portuguese
+    # "ja": "ja", # Japanese
+    # "ko": "ko", # Korean
+    # "ru": "ru", # Russian
+    # # Twitch just gives us "zh" for both, so just use Simplified
+    # "zhs": "zh", # Simplified Chinese
+    # #"zht": "zh", # Traditional Chinese
 }
 
 # Load data about cards we've seen before
@@ -41,15 +41,21 @@ if version == "":
 
 external_mtga = requests.get("{}/External_{}.mtga".format(CDN_URL, version))
 manifest_mtga = requests.get("{}/Manifest_{}.mtga".format(CDN_URL, external_mtga.text.strip()))
+if manifest_mtga.content[0] != '{':
+    # deal with case when content remains compressed
+    manifest_mtga_json = json.loads(zlib.decompress(manifest_mtga.content, 16+zlib.MAX_WBITS).decode('utf-8'))
+else:
+    manifest_mtga_json = manifest_mtga.json()
+
 data_cards_name = None
-for a in manifest_mtga.json()["Assets"]:
+for a in manifest_mtga_json["Assets"]:
     if a["Name"].startswith("data_cards_"):
         data_cards_name = a["Name"]
         break
 if data_cards_name is None:
     sys.exit("Could not find card data")
 data_cards = requests.get("{}/{}".format(CDN_URL, data_cards_name))
-buf = io.BytesIO(data_cards.content)
+buf = io.BytesIO(zlib.decompress(data_cards.content, 16+zlib.MAX_WBITS))
 buf.name = data_cards_name
 bundle = unitypack.load(buf)
 cards_file = list(bundle.assets[0].objects.values())[1]
@@ -72,7 +78,7 @@ for card in cards_json:
             "Rarity": sfd["rarity"],
             "CMC": str(int(sfd["cmc"])),
             "Colors": "".join(sfd["color_identity"]),
-            "DualSided": str(sfd["layout"] in ("transform",).lower()),
+            "DualSided": str(sfd["layout"] in ("transform",)).lower(),
         }
 
 # Export cards db
