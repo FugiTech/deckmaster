@@ -9,6 +9,14 @@ Vue.use(Vuetify)
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.config.productionTip = false
 
+Vue.mixin({
+  methods: {
+    open(link) {
+      this.$electron.shell.openExternal(link)
+    },
+  },
+})
+
 /* eslint-disable no-new */
 new Vue({
   router,

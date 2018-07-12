@@ -1,6 +1,6 @@
 <template>
   <v-app dark>
-    <v-system-bar status color="grey darken-4">
+    <v-system-bar app status color="grey darken-4">
       <v-spacer class="drag"></v-spacer>
       <v-btn flat @click.native="w.minimize()">
         <v-icon>remove</v-icon>
@@ -12,36 +12,78 @@
         <v-icon>close</v-icon>
       </v-btn>
     </v-system-bar>
-    <v-toolbar prominent>
+
+    <v-toolbar app prominent clipped-left>
       <v-toolbar-title>
         <span class="logo">
-          <img src="https://deckmaster.fugi.io/logo.png" />
+          <img src="@/assets/logo.png" />
         </span>
-        <span class="title-holder">
+        <span class="title-holder hidden-xs-only">
           <div class="title">Deckmaster</div>
-          <div class="version">v1.000</div>
+          <div class="subtitle">
+            <v-speed-dial class="language" direction="bottom" transition="slide-y-transition">
+              <v-btn slot="activator" flat>{{ languages[language] }}</v-btn>
+              <v-list dense>
+                <v-list-tile v-for="(name, code) in languages" :key="code" @click="language = code">
+                  <v-list-tile-content>
+                    {{ name.toUpperCase() }}
+                  </v-list-tile-content>
+                </v-list-tile>
+              </v-list>
+            </v-speed-dial>
+            <v-spacer />
+            <div class="version">{{ $store.state.version }}</div>
+          </div>
         </span>
       </v-toolbar-title>
       <v-spacer />
       <v-toolbar-items>
-        <v-btn flat to="status">Status</v-btn>
-        <v-btn flat to="status">Something</v-btn>
-        <v-btn flat to="status">Contact</v-btn>
+        <v-btn flat to="/arena/">MTG Arena</v-btn>
+        <v-btn flat to="/deckmaster/">Deckmaster</v-btn>
       </v-toolbar-items>
     </v-toolbar>
+
+    <v-bottom-nav app :value="true" height="36">
+      <v-btn v-for="r in currentRoutes" :key="r.name" :to="{name: r.name}">
+        <span>{{ r.name.toUpperCase() }}</span>
+        <v-icon>{{ r.icon }}</v-icon>
+      </v-btn>
+    </v-bottom-nav>
+
     <v-content>
-      <v-container fluid fill-height>
-        <router-view></router-view>
-      </v-container>
+      <v-fade-transition>
+        <router-view />
+      </v-fade-transition>
     </v-content>
   </v-app>
 </template>
 
 <script>
 export default {
+  data: function() {
+    return {
+      language: 'en',
+      languages: {
+        en: 'english',
+        ja: 'japanese',
+        zht: 'chinese',
+      },
+    }
+  },
   computed: {
     w() {
       return this.$electron.remote.getCurrentWindow()
+    },
+    currentRoutes() {
+      return Object.values(this.$router.options.routes)
+        .filter(r => {
+          return (r.children || []).some(c => {
+            return c.name == this.$route.name
+          })
+        })[0]
+        .children.filter(c => {
+          return c.path !== '*'
+        })
     },
   },
 }
@@ -60,10 +102,7 @@ html {
 <style>
 .system-bar {
   padding: 0 !important;
-  box-shadow: none !important;
   z-index: 4;
-
-  -webkit-user-select: none;
 }
 .system-bar .drag {
   height: 100%;
@@ -89,9 +128,35 @@ html {
   margin: 0;
   z-index: 5;
 }
+
+.language .list__tile {
+  height: 20px !important;
+  font-size: 10px;
+  font-weight: 200;
+  line-height: 20px;
+}
+
+::-webkit-scrollbar {
+  width: 1em;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #212121;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #9e9e9e;
+}
 </style>
 
 <style scoped>
+#app {
+  user-select: none;
+}
+
+.toolbar__title {
+  overflow: visible;
+}
 .logo {
   display: inline-block;
   vertical-align: middle;
@@ -114,9 +179,18 @@ html {
   font-size: 40px !important;
   font-weight: 200;
 }
-.version {
-  font-size: 10px;
-  font-weight: 200;
-  text-align: right;
+.subtitle,
+.language .btn {
+  display: flex;
+  font-size: 10px !important;
+  font-weight: 200 !important;
+}
+.language .btn {
+  margin: 0;
+  height: 15px;
+  min-width: 0;
+}
+.content {
+  max-height: 100vh;
 }
 </style>
