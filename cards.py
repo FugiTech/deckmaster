@@ -66,7 +66,7 @@ with open("cards.json", "w") as f:
 # Add cards to cards_db, using scryfall to get additional info
 for card in cards_json:
     id = str(card["grpid"])
-    if id not in cards_db:
+    if id not in cards_db and card["set"] != "ANA":
         set = ("t" if card["isToken"] else "") + set_overrides.get(card["set"], card["set"].lower())
         sfd = requests.get("https://api.scryfall.com/cards/{}/{}".format(set, card["CollectorNumber"])).json()
         cards_db[id] = {
