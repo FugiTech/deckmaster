@@ -81,11 +81,11 @@ type GameState struct {
 }
 
 type BroadcastMessage struct {
-	GameState   // deprecated: remove after v0.0.2 is released
+	GameState   `json:"-"`
 	Zones       []Zone
 	Triggers    []Trigger
-	Reset       bool // Used for whenever we clear all the data
-	ActiveDeck  string
+	Reset       bool   // Used for whenever we clear all the data
+	ActiveDeck  string `json:"-"`
 	DoubleSided map[int]bool
 }
 
