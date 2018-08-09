@@ -21,7 +21,16 @@
         <span class="title-holder hidden-xs-only">
           <div class="title">Deckmaster</div>
           <div class="subtitle">
-            <v-speed-dial class="language" direction="bottom" transition="slide-y-transition">
+            <v-speed-dial class="logout" open-on-hover direction="bottom" transition="slide-y-transition" v-if="$store.state.loggedIn">
+              <v-btn slot="activator" flat>{{ $store.state.oauth ? $store.state.oauth.username : '------' }}</v-btn>
+              <v-list dense>
+                <v-list-tile @click="$store.commit('logout')">
+                  <v-list-tile-content> Logout </v-list-tile-content>
+                </v-list-tile>
+              </v-list>
+            </v-speed-dial>
+            <v-spacer />
+            <v-speed-dial class="language" direction="bottom" transition="slide-y-transition" v-if="false">
               <v-btn slot="activator" flat>{{ languages[language] }}</v-btn>
               <v-list dense>
                 <v-list-tile v-for="(name, code) in languages" :key="code" @click="language = code">
@@ -94,22 +103,21 @@ $body-font-family = 'Montserrat'
 
 @import '~vuetify/src/stylus/main'
 
-html {
-  overflow-y: hidden;
-}
+html
+  overflow-y: hidden
 </style>
 
 <style>
-.system-bar {
+.v-system-bar {
   padding: 0 !important;
   z-index: 4;
 }
-.system-bar .drag {
+.v-system-bar .drag {
   height: 100%;
 
   -webkit-app-region: drag;
 }
-.system-bar .btn {
+.v-system-bar .v-btn {
   height: 24px;
   width: 36px;
   min-width: 24px;
@@ -118,18 +126,18 @@ html {
 
   -webkit-app-region: no-drag;
 }
-.system-bar .btn .btn__content {
+.v-system-bar .v-btn .v-btn__content {
   padding: 4px;
 }
-.system-bar .btn.red--text .btn__content:before {
+.v-system-bar .v-btn.red--text .v-btn__content:before {
   opacity: 1;
 }
-.system-bar .btn .icon {
+.v-system-bar .v-btn .v-icon {
   margin: 0;
   z-index: 5;
 }
 
-.language .list__tile {
+.subtitle .v-list__tile {
   height: 20px !important;
   font-size: 10px;
   font-weight: 200;
@@ -147,6 +155,29 @@ html {
 ::-webkit-scrollbar-thumb {
   background-color: #9e9e9e;
 }
+
+[style*='--aspect-ratio'] > :first-child {
+  width: 100%;
+}
+[style*='--aspect-ratio'] > img {
+  height: auto;
+}
+@supports (--custom: property) {
+  [style*='--aspect-ratio'] {
+    position: relative;
+  }
+  [style*='--aspect-ratio']::before {
+    content: '';
+    display: block;
+    padding-bottom: calc(100% / (var(--aspect-ratio)));
+  }
+  [style*='--aspect-ratio'] > :first-child {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+  }
+}
 </style>
 
 <style scoped>
@@ -154,7 +185,7 @@ html {
   user-select: none;
 }
 
-.toolbar__title {
+.v-toolbar__title {
   overflow: visible;
 }
 .logo {
@@ -180,12 +211,12 @@ html {
   font-weight: 200;
 }
 .subtitle,
-.language .btn {
+.subtitle .v-btn {
   display: flex;
   font-size: 10px !important;
   font-weight: 200 !important;
 }
-.language .btn {
+.subtitle .v-btn {
   margin: 0;
   height: 15px;
   min-width: 0;

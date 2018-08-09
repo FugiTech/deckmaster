@@ -53,6 +53,7 @@
   "dependencies": {
     "lodash": "^4.17.10",
     "moment": "^2.22.2",
+    "nanoid": "^1.1.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
     "vue": "^2.3.3",
@@ -60,7 +61,8 @@
     "vue-router": "^2.5.3",
     "vuetify": "^1.0.0",
     "vuex": "^2.3.1",
-    "vuex-persistfile": "^0.1.4"
+    "vuex-persistfile": "^0.1.4",
+    "ws": "^6.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",

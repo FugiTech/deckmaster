@@ -5,7 +5,7 @@
         <v-flex xs2 class="text-xs-right pr-2">{{ r.name }}</v-flex>
         <v-flex xs10 class="pl-4">
           <ul>
-            <li v-for="c in r.changes">{{ c }}</li>
+            <li v-for="c in r.changes" :key="c">{{ c }}</li>
           </ul>
         </v-flex>
       </v-layout>

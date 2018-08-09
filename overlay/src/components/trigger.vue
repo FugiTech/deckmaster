@@ -1,5 +1,5 @@
 <template>
-  <div class="trigger" :style="triggerStyle" @mouseover="visible = true" @mouseout="visible = false" @click="$store.commit('setActiveTrigger', d.ID)">
+  <div class="trigger" :style="triggerStyle" @mouseover="hover = true" @mouseout="hover = false" @click="$store.commit('setActiveTrigger', d.ID)">
     <div ref="name" class="name" :style="nameStyle">{{ d.Name }}</div>
     <div ref="help" class="help" :style="helpStyle">Click to view</div>
     <div ref="count" class="count" :style="countStyle">{{ d.CardCount }}</div>
@@ -14,13 +14,16 @@ export default {
   props: ['d'],
   data: function() {
     return {
-      visible: false,
+      hover: false,
       nameSize: 12,
       helpSize: 12,
       countSize: 12,
     }
   },
   computed: {
+    visible() {
+      return this.hover || this.$store.state.forceOpen
+    },
     triggerStyle() {
       return {
         left: this.d.X,
@@ -67,7 +70,10 @@ export default {
       requestAnimationFrame(() => {
         this.nameSize *= this.$el.clientWidth / this.$refs.name.scrollWidth
         this.helpSize *= this.$el.clientWidth / this.$refs.help.scrollWidth
-        this.countSize = Math.min((this.$el.clientHeight - lineHeightMultiplier * this.nameSize - lineHeightMultiplier * this.helpSize) / lineHeightMultiplier, this.$el.clientWidth / this.$refs.count.scrollWidth * this.countSize)
+        this.countSize = Math.min(
+          (this.$el.clientHeight - lineHeightMultiplier * this.nameSize - lineHeightMultiplier * this.helpSize) / lineHeightMultiplier,
+          this.$el.clientWidth / this.$refs.count.scrollWidth * this.countSize,
+        )
       })
     },
   },
