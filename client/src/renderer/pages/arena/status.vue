@@ -4,6 +4,19 @@
       <v-flex xs1 :style="s.logexist">Arena log file exists</v-flex>
       <v-flex xs1 :style="s.logupdate">Arena log file has updated in last minute</v-flex>
       <v-flex xs1 :style="s.gameongoing">Game or Draft is occurring</v-flex>
+      <v-flex xs1 :style="s.extinstalled">
+        <v-layout row align-center>
+          <div :class="{'grey--text': !$store.state.enabledFeatures.extensionManagement}">Deckmaster extension installed</div>
+          <template v-if="!$store.state.enabledFeatures.extensionManagement">
+            <v-spacer />
+            <v-btn small color="" @click="open($store.getters.loginURL(true))">LOGIN</v-btn>
+            <div class="body-1">to unlock this feature</div>
+          </template>
+          <template v-if="$store.state.enabledFeatures.extensionManagement && $store.state.status.extinstalled === false">
+            <v-btn small color="" @click="open('https://www.twitch.tv/ext/cplheah4pxjyuwe9mkno9kbmb11lyc')">INSTALL</v-btn>
+          </template>
+        </v-layout>
+      </v-flex>
       <v-flex xs1 :style="s.extactive">
         <v-layout row align-center>
           <div :class="{'grey--text': !$store.state.enabledFeatures.extensionManagement}">Deckmaster extension active</div>
@@ -41,6 +54,7 @@ export default {
     s() {
       let r = {}
       for (let [k, v] of Object.entries(this.$store.state.status)) {
+        if (v !== true && v !== false) continue
         r[k] = {
           color: v ? colors.green.base : colors.red.base,
           'font-weight': v ? 300 : 700,

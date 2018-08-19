@@ -129,7 +129,7 @@ html
 .v-system-bar .v-btn .v-btn__content {
   padding: 4px;
 }
-.v-system-bar .v-btn.red--text .v-btn__content:before {
+.v-system-bar .v-btn.red--text:before {
   opacity: 1;
 }
 .v-system-bar .v-btn .v-icon {

@@ -20,7 +20,6 @@ else:
 
 bundles = {
   "data_cards": None,
-  "data_abilities": None,
   "data_loc": None,
   "ANA_cardart": None,
 }
@@ -40,7 +39,6 @@ for (k, v) in bundles.items():
 
 
 cards_list = json.loads(list(bundles["data_cards"].assets[0].objects.values())[1].read().bytes)
-abilities_list = json.loads(list(bundles["data_abilities"].assets[0].objects.values())[1].read().bytes)
 loc_list = json.loads(list(bundles["data_loc"].assets[0].objects.values())[1].read().bytes)
 
 abilities = {}

@@ -1,0 +1,8 @@
+{
+  "name": "deckmaster",
+  "alias": "deckmaster.fugi.tech",
+  "env": {
+    "CLIENT_SECRET": "@deckmaster-client-secret",
+    "EXT_SECRET": "@deckmaster-ext-secret"
+  }
+}

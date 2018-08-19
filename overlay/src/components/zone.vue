@@ -32,6 +32,11 @@ export default {
       hover: false,
     }
   },
+  beforeDestroy() {
+    if (this.hover) {
+      this.$emit('input', null)
+    }
+  },
   computed: {
     numCards() {
       return this.Cards ? this.Cards.length : 0
@@ -223,7 +228,7 @@ $border-size = 6px
   background-size: 300% 300%
   content: ''
   animation: frame-enter 1s forwards ease-in-out reverse, gradient-animation 1s ease-in-out infinite
-  clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, $border-size 'calc(100% - %s)' % $border-size, $border-size 100%, 100% 100%, 100% 0, 0 0)
+  clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, ('calc(100% - %s)' % $border-size)$border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, $border-size 'calc(100% - %s)' % $border-size, $border-size 100%, 100% 100%, 100% 0, 0 0)
 
 @keyframes gradient-animation
   0%
@@ -240,13 +245,13 @@ $border-size = 6px
 
 @keyframes frame-enter
   0%
-    clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, $border-size 'calc(100% - %s)' % $border-size, $border-size 100%, 100% 100%, 100% 0, 0 0)
+    clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, ('calc(100% - %s)' % $border-size)$border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, $border-size 'calc(100% - %s)' % $border-size, $border-size 100%, 100% 100%, 100% 0, 0 0)
 
   25%
-    clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, 'calc(100% - %s)' % $border-size 100%, 100% 100%, 100% 0, 0 0)
+    clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, ('calc(100% - %s)' % $border-size)$border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, 'calc(100% - %s)' % $border-size 100%, 100% 100%, 100% 0, 0 0)
 
   50%
-    clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 100% 0, 0 0)
+    clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, ('calc(100% - %s)' % $border-size)$border-size, ('calc(100% - %s)' % $border-size)$border-size, ('calc(100% - %s)' % $border-size)$border-size, ('calc(100% - %s)' % $border-size)$border-size, ('calc(100% - %s)' % $border-size)$border-size, 100% 0, 0 0)
 
   75%
     clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, $border-size $border-size, $border-size $border-size, $border-size $border-size, $border-size $border-size, $border-size $border-size, $border-size 0, 0 0)

@@ -37,15 +37,24 @@ export default class Parser {
       pickedCards: [],
     }
     this.gameState = _.cloneDeep(this.defaultGameState)
+    this.enableExtension = _.throttle(
+      () => {
+        this.store.dispatch('enableExtension')
+      },
+      20000,
+      { leading: true, trailing: false },
+    )
   }
 
   parse(data) {
     if (data) {
       this.store.commit('statusUpdate', { logupdate: true })
+      this.enableExtension()
       if (this.timeout) clearTimeout(this.timeout)
       this.timeout = setTimeout(() => {
         this.store.commit('statusUpdate', { logupdate: false })
-      }, 60000)
+        this.store.dispatch('disableExtension')
+      }, 61000)
     }
 
     // Add the fresh data

@@ -5,16 +5,16 @@
         <h1 v-if="showDeckmaster">Deckmaster</h1>
         <img id="logo" src="https://deckmaster.fugi.io/logo.png" />
         <template v-if="showDeckmaster">
-          <div class="link" @click="globalHide = !globalHide">
-            <template v-if="globalHide">Enable extension (persists through reloads)</template>
-            <template v-if="!globalHide">Disable extension (persists through reloads)</template>
+          <div class="link" @click="$store.commit('toggleGlobalHide')">
+            <template v-if="$store.state.globalHide">Enable extension (persists through reloads)</template>
+            <template v-if="!$store.state.globalHide">Disable extension (persists through reloads)</template>
           </div>
           <div class="small">Give feedback & ask questions at discord.gg/DXJS6jb</div>
           <div class="small">Support development at patreon.com/fugi</div>
         </template>
       </div>
 
-      <template v-if="!globalHide">
+      <template v-if="!$store.state.globalHide">
         <div id="focusCard" v-if="focusCard">
           <template v-for="(card, idx) in focusCard">
             <LazyImage :card="card" :key="idx" />
@@ -43,7 +43,6 @@ export default {
   data: function() {
     return {
       showDeckmaster: false,
-      globalHide: false,
     }
   },
   computed: {

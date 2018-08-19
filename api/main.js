@@ -9,7 +9,7 @@ const fetch = require('node-fetch')
 const hostname = '0.0.0.0'
 const port = process.env.PORT || 8080
 const client_id = 'cplheah4pxjyuwe9mkno9kbmb11lyc'
-const redirect_uri = 'http://localhost:8080/login'
+const redirect_uri = 'https://deckmaster.fugi.tech/login'
 const ext_secret = Buffer.from(process.env.EXT_SECRET, 'base64')
 const client_secret = process.env.CLIENT_SECRET
 
@@ -57,7 +57,6 @@ app.get('/login', (req, res) => {
           loginData.id_token,
           (header, callback) => {
             jwks.getSigningKey(header.kid, (err, key) => {
-              console.log(err)
               callback(err, key.publicKey || key.rsaPublicKey)
             })
           },
@@ -67,7 +66,6 @@ app.get('/login', (req, res) => {
           },
           (err, decoded) => {
             r()
-            console.log(err)
             if (err) return
             loginData.username = decoded.preferred_username
             loginData.token = jwt.sign(
@@ -81,12 +79,25 @@ app.get('/login', (req, res) => {
               ext_secret,
             )
             ws.send(JSON.stringify({ loginData }))
+            wsByUID.set(decoded.sub, ws)
           },
         )
       })
     })
     .then(() => {
       res.send('You may close the window and check Deckmaster now')
+    })
+})
+app.get('/refresh', (req, res) => {
+  fetch(`https://id.twitch.tv/oauth2/token?grant_type=refresh_token&client_id=${client_id}&client_secret=${client_secret}&refresh_token=${req.query.token}`, {
+    method: 'POST',
+  })
+    .then(r => {
+      res.status(r.status)
+      return r.json()
+    })
+    .then(d => {
+      res.json(d)
     })
 })
 wss.on('connection', (ws, req) => {
@@ -148,6 +159,17 @@ app.get('/vote_results', (req, res) => {
 // Public
 app.post('/vote', (req, res) => {
   let token = jwt.verify(req.body.token, ext_secret)
+
+  if (wsByUID.has(token.channel_id)) {
+    let ws = wsByUID.get(token.channel_id)
+    let vote = {
+      ip: req.ip,
+      user: token.user_id,
+      draftID: req.body.draft_id,
+      card: req.body.card,
+    }
+    ws.send(JSON.stringify({ vote }))
+  }
 
   if (!votes.has(token.channel_id)) votes.set(token.channel_id, new Map())
   let cdata = votes.get(token.channel_id)

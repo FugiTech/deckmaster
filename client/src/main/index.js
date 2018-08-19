@@ -1,14 +1,13 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
-import storeFactory from './store'
-import startServer from './server'
-import tailLog from './tail'
-import Parser from './parser'
 import _ from 'lodash'
+import storeFactory from './store'
+import tailLog from './tail'
+import publish from './publisher'
+import Parser from './parser'
 
 let mainWindow, store, parser
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
-
 const logPath = path.join(app.getPath('userData'), '..', '..', 'LocalLow', 'Wizards of the Coast', 'MTGA', 'output_log.txt')
 
 function createWindow() {
@@ -49,9 +48,9 @@ function createWindow() {
 app.on('ready', () => {
   store = storeFactory(app.getPath('userData'), ipcMain)
   parser = new Parser(store)
-  createWindow()
-  startServer(store)
   tailLog(store, logPath, parser.parse.bind(parser))
+  publish(store)
+  createWindow()
 })
 
 app.on('window-all-closed', () => {
@@ -63,6 +62,14 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
+  }
+})
+
+app.on('will-quit', async e => {
+  if (store.state.status.extactive) {
+    e.preventDefault()
+    await store.dispatch('disableExtension')
+    app.quit()
   }
 })
 
