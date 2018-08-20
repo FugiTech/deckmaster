@@ -1,12 +1,12 @@
+import { app } from 'electron'
 import { URL } from 'url'
 import nanoid from 'nanoid'
 import _ from 'lodash'
-import VERSION from '../version'
 import AllCards from '../cards'
 
 const mutations = {
   updateVersion(state) {
-    state.version = VERSION
+    state.version = app.getVersion()
   },
   setToken(state, token) {
     let d = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())

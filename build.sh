@@ -18,8 +18,10 @@ mkdir dist/netlify
 # Build twitch bundle
 cd config && yarn build && cd ..
 cd overlay && yarn build && cd ..
+cd mobile && yarn build && cd ..
 mv config/dist dist/twitch/config
 mv overlay/dist dist/twitch/overlay
+mv mobile/dist dist/twitch/mobile
 
 cd dist/twitch && zip -r ../twitch.zip * && cd ../..
 
@@ -27,6 +29,10 @@ cd dist/twitch && zip -r ../twitch.zip * && cd ../..
 cp -r cards dist/netlify/cards
 cp -r dist/netlify/cards/en/* dist/netlify/cards
 cp logo.png dist/netlify
+
+
+
+
 
 cd client_ui && yarn build && cd ..
 go get github.com/rakyll/statik

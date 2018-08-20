@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
+import { autoUpdater } from 'electron-updater'
 import path from 'path'
 import _ from 'lodash'
 import storeFactory from './store'
@@ -45,7 +46,13 @@ function createWindow() {
   mainWindow.webContents.on('did-navigate-in-page', updateWindowOptions)
 }
 
-app.on('ready', () => {
+app.on('ready', async () => {
+  let ur = await autoUpdater.checkForUpdates()
+  if (!!ur.downloadPromise) {
+    await ur.downloadPromise
+    autoUpdater.quitAndInstall()
+    return
+  }
   store = storeFactory(app.getPath('userData'), ipcMain)
   parser = new Parser(store)
   tailLog(store, logPath, parser.parse.bind(parser))
@@ -66,29 +73,9 @@ app.on('activate', () => {
 })
 
 app.on('will-quit', async e => {
-  if (store.state.status.extactive) {
+  if (store && store.state.status.extactive) {
     e.preventDefault()
     await store.dispatch('disableExtension')
     app.quit()
   }
 })
-
-/**
- * Auto Updater
- *
- * Uncomment the following code below and install `electron-updater` to
- * support auto updating. Code Signing with a valid certificate is required.
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
- */
-
-/*
-import { autoUpdater } from 'electron-updater'
-
-autoUpdater.on('update-downloaded', () => {
-  autoUpdater.quitAndInstall()
-})
-
-app.on('ready', () => {
-  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
-})
- */
