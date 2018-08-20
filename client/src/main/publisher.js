@@ -1,12 +1,43 @@
 import fetch from 'node-fetch'
+import WebSocket from 'ws'
 import { client_id } from './vars'
 
 export default function(store) {
+  let devPublish = () => {}
+  let devShutdown = () => {}
+
+  if (process.env.NODE_ENV === 'development') {
+    let wss = new WebSocket.Server({
+      host: '127.0.0.1',
+      port: 22223,
+      clientTracking: true,
+    })
+    devPublish = msg => {
+      wss.clients.forEach(ws => {
+        ws.send(msg)
+      })
+    }
+    devShutdown = () => {
+      wss.close()
+    }
+  }
+
   let i = setInterval(async () => {
     if (!store.state.token || store.state.token.expires <= +new Date() / 1000) {
       store.commit('statusUpdate', { pubsub: false })
       return
     }
+
+    let msg = JSON.stringify({
+      zones: store.state.zones,
+      triggers: store.state.triggers,
+      activeDeck: store.state.activeDeck,
+      doubleSided: store.state.doubleSided,
+      draftID: store.state.draftEnabled ? store.state.draftID : false,
+      overlayPositioning: store.state.overlayPositioning,
+    })
+
+    devPublish(msg)
 
     try {
       let r = await fetch(`https://api.twitch.tv/extensions/message/${store.state.token.channelID}`, {
@@ -19,14 +50,7 @@ export default function(store) {
         body: JSON.stringify({
           targets: ['broadcast'],
           content_type: 'application/json',
-          message: JSON.stringify({
-            zones: store.state.zones,
-            triggers: store.state.triggers,
-            activeDeck: store.state.activeDeck,
-            doubleSided: store.state.doubleSided,
-            draftID: store.state.draftEnabled ? store.state.draftID : false,
-            overlayPositioning: store.state.overlayPositioning,
-          }),
+          message: msg,
         }),
       })
       store.commit('statusUpdate', { pubsub: r.ok })
@@ -37,5 +61,6 @@ export default function(store) {
   }, 1000)
   return () => {
     clearInterval(i)
+    devShutdown()
   }
 }

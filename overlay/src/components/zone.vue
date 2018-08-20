@@ -1,5 +1,5 @@
 <template>
-  <div class="zone" :class="{ vert: Vert, hori: !Vert, chosen: chosen, visible: visible }" :style="zoneStyle" @mouseover="hover = true" @mouseout="hover = false">
+  <div class="zone" :class="{ vert: Vert, hori: !Vert, voteable: Voteable, chosen: chosen, visible: visible }" :style="zoneStyle" @mouseover="hover = true" @mouseout="hover = false">
     <div class="name" v-if="Trigger">
       {{ Trigger }}
       <a class="close" @click="$store.commit('setActiveTrigger', null)">close</a>
@@ -23,7 +23,7 @@ const attachAdjust = 8
 
 export default {
   name: 'Zone',
-  props: ['value', 'Vert', 'Cards', 'Attachments', 'Trigger', 'Score', 'X', 'Y', 'H', 'W'],
+  props: ['value', 'Vert', 'Voteable', 'Cards', 'Attachments', 'Trigger', 'Score', 'X', 'Y', 'H', 'W'],
   components: {
     LazyImage,
   },
@@ -89,7 +89,7 @@ export default {
       return r
     },
     zoneID() {
-      if (!this.$store.state.draftID || this.numCards !== 1) return false
+      if (!this.$store.state.draftID || this.numCards !== 1 || !this.Voteable) return false
       return `${this.$store.state.draftID}-${this.Cards[0]}`
     },
     chosen() {
@@ -165,8 +165,10 @@ img {
   vertical-align: top;
 }
 .card-holder:hover > .card {
-  cursor: pointer;
   box-shadow: 0 0 6px 2px #0ff;
+}
+.voteable .card-holder:hover > .card {
+  cursor: pointer;
 }
 .zone.vert .card {
   width: 100%;

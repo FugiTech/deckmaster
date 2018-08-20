@@ -308,8 +308,7 @@ export default class Parser {
     const rarityOrder = ['mythic', 'rare', 'uncommon', 'common', 'land']
     const colorOrder = [1, 2, 4, 8, 16, 3, 5, 6, 10, 12, 20, 24, 9, 17, 18, 7, 14, 28, 25, 19, 13, 26, 21, 11, 22, 15, 30, 29, 27, 23, 31, 0]
     // order of sorts goes from least important -> most important
-    return _
-      .chain(cards)
+    return _.chain(cards)
       .map(c => +c)
       .sortBy(c => AllCards.get(c).cmc)
       .sortBy(c => {
@@ -350,27 +349,26 @@ export default class Parser {
 
   updateStore(draftID) {
     let zones = [
-      { Cards: this.gameState.player.hand, X: '30%', Y: '86%', H: '14%', W: '40%' },
-      { Cards: this.gameState.opponent.hand, X: '30%', Y: '0%', H: '10%', W: '40%' },
-
-      Object.assign({ X: '10%', Y: '65%', H: '15%', W: '36%' }, this.attach(this.gameState.player.lands, this.gameState.attachments.player)),
-      Object.assign({ X: '54%', Y: '65%', H: '15%', W: '36%' }, this.attach(this.gameState.player.permanents, this.gameState.attachments.player)),
-      Object.assign({ X: '10%', Y: '47%', H: '18%', W: '80%' }, this.attach(this.gameState.player.creatures, this.gameState.attachments.player)),
-      Object.assign({ X: '10%', Y: '14%', H: '10%', W: '37%' }, this.attach(this.gameState.opponent.lands, this.gameState.attachments.opponent)),
-      Object.assign({ X: '53%', Y: '14%', H: '10%', W: '37%' }, this.attach(this.gameState.opponent.permanents, this.gameState.attachments.opponent)),
-      Object.assign({ X: '10%', Y: '25%', H: '18%', W: '80%' }, this.attach(this.gameState.opponent.creatures, this.gameState.attachments.opponent)),
-
-      { Trigger: 'Player Deck', Vert: true, Cards: this.gameState.player.library, X: '84.5%', Y: '170px', H: 'calc(100% - 270px)', W: '15%' },
-      { Trigger: 'Player Graveyard', Vert: true, Cards: this.gameState.player.graveyard, X: '84.5%', Y: '170px', H: 'calc(100% - 270px)', W: '15%' },
+      { Name: 'Player Hand', Cards: this.gameState.player.hand, X: '30%', Y: '86%', H: '14%', W: '40%' },
+      Object.assign({ Name: 'Player Creatures', X: '10%', Y: '47%', H: '18%', W: '80%' }, this.attach(this.gameState.player.creatures, this.gameState.attachments.player)),
+      Object.assign({ Name: 'Player Permanents', X: '54%', Y: '65%', H: '15%', W: '36%' }, this.attach(this.gameState.player.permanents, this.gameState.attachments.player)),
       { Trigger: 'Player Exile', Vert: true, Cards: this.gameState.player.exile, X: '84.5%', Y: '170px', H: 'calc(100% - 270px)', W: '15%' },
-      { Trigger: 'Opponent Deck', Vert: true, Cards: this.gameState.opponent.library, X: '84.5%', Y: '170px', H: 'calc(100% - 270px)', W: '15%' },
-      { Trigger: 'Opponent Graveyard', Vert: true, Cards: this.gameState.opponent.graveyard, X: '84.5%', Y: '170px', H: 'calc(100% - 270px)', W: '15%' },
-      { Trigger: 'Opponent Exile', Vert: true, Cards: this.gameState.opponent.exile, X: '84.5%', Y: '170px', H: 'calc(100% - 270px)', W: '15%' },
+      { Trigger: 'Player Graveyard', Vert: true, Cards: this.gameState.player.graveyard, X: '84.5%', Y: '170px', H: 'calc(100% - 270px)', W: '15%' },
+      { Trigger: 'Player Deck', Vert: true, Cards: this.gameState.player.library, X: '84.5%', Y: '170px', H: 'calc(100% - 270px)', W: '15%' },
+      Object.assign({ Name: 'Player Lands', X: '10%', Y: '65%', H: '15%', W: '36%' }, this.attach(this.gameState.player.lands, this.gameState.attachments.player)),
 
-      { Vert: true, Cards: this.gameState.pickedCards, X: '78.5%', Y: '16%', H: '74%', W: '21%' },
+      { Name: 'Opponent Hand', Cards: this.gameState.opponent.hand, X: '30%', Y: '0%', H: '10%', W: '40%' },
+      Object.assign({ Name: 'Opponent Creatures', X: '10%', Y: '25%', H: '18%', W: '80%' }, this.attach(this.gameState.opponent.creatures, this.gameState.attachments.opponent)),
+      Object.assign({ Name: 'Opponent Permanents', X: '53%', Y: '14%', H: '10%', W: '37%' }, this.attach(this.gameState.opponent.permanents, this.gameState.attachments.opponent)),
+      { Trigger: 'Opponent Exile', Vert: true, Cards: this.gameState.opponent.exile, X: '84.5%', Y: '170px', H: 'calc(100% - 270px)', W: '15%' },
+      { Trigger: 'Opponent Graveyard', Vert: true, Cards: this.gameState.opponent.graveyard, X: '84.5%', Y: '170px', H: 'calc(100% - 270px)', W: '15%' },
+      { Trigger: 'Opponent Deck', Vert: true, Cards: this.gameState.opponent.library, X: '84.5%', Y: '170px', H: 'calc(100% - 270px)', W: '15%' },
+      Object.assign({ Name: 'Opponent Lands', X: '10%', Y: '14%', H: '10%', W: '37%' }, this.attach(this.gameState.opponent.lands, this.gameState.attachments.opponent)),
+
+      { Name: 'Draft Deck', Vert: true, Cards: this.gameState.pickedCards, X: '78.5%', Y: '16%', H: '74%', W: '21%' },
     ]
     this.gameState.draftPack.forEach((card, i) => {
-      zones.push({ Cards: [card], H: '26%', W: '11%', X: 14.8 + 10.5 * (i % 5) + '%', Y: 18.2 + 26.0 * Math.floor(i / 5) + '%' })
+      zones.push({ Name: 'Draft Pack', Voteable: true, Cards: [card], H: '26%', W: '11%', X: 14.8 + 10.5 * (i % 5) + '%', Y: 18.2 + 26.0 * Math.floor(i / 5) + '%' })
     })
     let triggers = [
       { ID: 'Player Deck', Name: 'Deck', CardCount: this.gameState.player.library.length, X: '9%', Y: '83%', H: '16%', W: '7%' },

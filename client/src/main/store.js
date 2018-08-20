@@ -7,6 +7,7 @@ import getters from './store/getters'
 import mutations from './store/mutations'
 import actions from './store/actions'
 import { serverURL } from './vars'
+import _ from 'lodash'
 
 Vue.use(Vuex)
 
@@ -118,34 +119,38 @@ export default function(path, ipc) {
     }
   })
 
-  let connectToServer = () => {
-    let ws = new WebSocket(`ws${serverURL}`)
-    let handleDisconnect = () => {
-      store.commit('statusUpdate', { deckmasterws: false })
-      setTimeout(connectToServer, 5000)
-    }
-    ws.on('error', handleDisconnect)
-    ws.on('open', () => {
-      ws.on('close', handleDisconnect)
-      store.commit('statusUpdate', { deckmasterws: true })
-      if (store.state.token) {
-        ws.send(JSON.stringify({ token: store.state.token.jwt }))
+  let connectToServer = _.throttle(
+    () => {
+      let ws = new WebSocket(`ws${serverURL}`)
+      let handleDisconnect = () => {
+        store.commit('statusUpdate', { deckmasterws: false })
+        connectToServer()
       }
-    })
-    ws.on('message', message => {
-      let d = JSON.parse(message)
-      console.log(d)
-      if ('state' in d) {
-        store.commit('loginState', d['state'])
-      }
-      if ('loginData' in d) {
-        store.commit('login', d['loginData'])
-      }
-      if ('vote' in d) {
-        store.dispatch('addDraftVote', d['vote'])
-      }
-    })
-  }
+      ws.on('error', handleDisconnect)
+      ws.on('open', () => {
+        ws.on('close', handleDisconnect)
+        store.commit('statusUpdate', { deckmasterws: true })
+        if (store.state.token) {
+          ws.send(JSON.stringify({ token: store.state.token.jwt }))
+        }
+      })
+      ws.on('message', message => {
+        let d = JSON.parse(message)
+        console.log(d)
+        if ('state' in d) {
+          store.commit('loginState', d['state'])
+        }
+        if ('loginData' in d) {
+          store.commit('login', d['loginData'])
+        }
+        if ('vote' in d) {
+          store.dispatch('addDraftVote', d['vote'])
+        }
+      })
+    },
+    5000,
+    { leading: true, trailing: true },
+  )
   connectToServer()
 
   return store

@@ -109,7 +109,9 @@ body,
 .card {
   border-radius: 5%;
 }
+</style>
 
+<style scoped>
 #logo {
   height: 50px;
 }

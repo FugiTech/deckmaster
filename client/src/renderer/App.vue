@@ -195,9 +195,7 @@ html
   width: 86px;
 }
 .logo img {
-  position: relative;
-  top: -12px;
-  height: 86px;
+  height: 64px;
 }
 .title-holder {
   display: inline-flex;
