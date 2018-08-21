@@ -76,4 +76,12 @@ window.Twitch.ext.listen('broadcast', (target, contentType, message) => {
   }, delay)
 })
 
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+  // Connect to dev websocket since going through pubsub hurts
+  let ws = new WebSocket('ws://localhost:22223/')
+  ws.onmessage = e => {
+    store.commit('handleBroadcast', JSON.parse(e.data))
+  }
+}
+
 export default store

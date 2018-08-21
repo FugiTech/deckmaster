@@ -5,8 +5,8 @@
       <a class="close" @click="$store.commit('setActiveTrigger', null)">close</a>
     </div>
     <div class="inner-zone" :style="{ visibility: numCards && visible ? 'visible' : 'hidden'}">
-      <span class="card-holder" v-for="(card, idx) in Cards" :key="idx" @mouseover="hovered(idx)" @mouseout="$emit('input', null)" :style="cardHolderStyle">
-        <LazyImage @click="clicked(card)" :card="card" :style="cardStyle.main[idx]" />
+      <span class="card-holder" v-for="(card, idx) in Cards" :key="idx" @click="clicked(card)" @mouseover="hovered(idx)" @mouseout="$emit('input', null)" :style="cardHolderStyle">
+        <LazyImage :card="card" :style="cardStyle.main[idx]" />
         <template v-if="Attachments">
           <LazyImage class="attachment" v-for="(card2, idx2) in Attachments[idx]" :key="`${idx}-${idx2}`" :card="card2" :style="cardStyle.attach[idx][idx2]" />
         </template>
@@ -125,7 +125,8 @@ export default {
 .zone.vert {
   overflow-y: auto;
 }
-.zone > div {
+.zone > .name,
+.zone > .inner-zone {
   opacity: 0;
   background: rgba(0, 0, 0, 0.5);
   transition: opacity 0.1s;
@@ -230,7 +231,7 @@ $border-size = 6px
   background-size: 300% 300%
   content: ''
   animation: frame-enter 1s forwards ease-in-out reverse, gradient-animation 1s ease-in-out infinite
-  clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, ('calc(100% - %s)' % $border-size)$border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, $border-size 'calc(100% - %s)' % $border-size, $border-size 100%, 100% 100%, 100% 0, 0 0)
+  clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, $border-size 'calc(100% - %s)' % $border-size, $border-size 100%, 100% 100%, 100% 0, 0 0)
 
 @keyframes gradient-animation
   0%
@@ -247,13 +248,13 @@ $border-size = 6px
 
 @keyframes frame-enter
   0%
-    clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, ('calc(100% - %s)' % $border-size)$border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, $border-size 'calc(100% - %s)' % $border-size, $border-size 100%, 100% 100%, 100% 0, 0 0)
+    clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, $border-size 'calc(100% - %s)' % $border-size, $border-size 100%, 100% 100%, 100% 0, 0 0)
 
   25%
-    clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, ('calc(100% - %s)' % $border-size)$border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, 'calc(100% - %s)' % $border-size 100%, 100% 100%, 100% 0, 0 0)
+    clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, 'calc(100% - %s)' % $border-size 'calc(100% - %s)' % $border-size, 'calc(100% - %s)' % $border-size 100%, 100% 100%, 100% 0, 0 0)
 
   50%
-    clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, ('calc(100% - %s)' % $border-size)$border-size, ('calc(100% - %s)' % $border-size)$border-size, ('calc(100% - %s)' % $border-size)$border-size, ('calc(100% - %s)' % $border-size)$border-size, ('calc(100% - %s)' % $border-size)$border-size, 100% 0, 0 0)
+    clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 'calc(100% - %s)' % $border-size $border-size, 100% 0, 0 0)
 
   75%
     clip-path: polygon(0 100%, $border-size 100%, $border-size $border-size, $border-size $border-size, $border-size $border-size, $border-size $border-size, $border-size $border-size, $border-size $border-size, $border-size 0, 0 0)

@@ -53,6 +53,7 @@ export default function(store) {
           message: msg,
         }),
       })
+      if (!r.ok) console.log(r)
       store.commit('statusUpdate', { pubsub: r.ok })
     } catch (e) {
       console.log(e)

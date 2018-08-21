@@ -2,7 +2,7 @@
   <v-container fluid fill-height>
     <v-layout column justify-space-around v-if="$store.state.loggedIn" class="status">
       <v-flex xs1 :style="s.logexist">Arena log file exists</v-flex>
-      <v-flex xs1 :style="s.logupdate">Arena log file has updated in last minute</v-flex>
+      <v-flex xs1 :style="s.logupdate">Arena log file has updated in last 10 minutes</v-flex>
       <v-flex xs1 :style="s.gameongoing">Game or Draft is occurring</v-flex>
       <v-flex xs1 :style="s.extinstalled">
         <v-layout row align-center>

@@ -6,7 +6,7 @@ import AllCards from '../cards'
 
 const mutations = {
   updateVersion(state) {
-    state.version = app.getVersion()
+    state.version = 'v' + app.getVersion()
   },
   setToken(state, token) {
     let d = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())

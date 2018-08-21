@@ -47,12 +47,15 @@ function createWindow() {
 }
 
 app.on('ready', async () => {
-  let ur = await autoUpdater.checkForUpdates()
-  if (!!ur.downloadPromise) {
-    await ur.downloadPromise
-    autoUpdater.quitAndInstall()
-    return
-  }
+  try {
+    let ur = await autoUpdater.checkForUpdates()
+    if (!!ur.downloadPromise) {
+      await ur.downloadPromise
+      autoUpdater.quitAndInstall()
+      return
+    }
+  } catch (e) {}
+
   store = storeFactory(app.getPath('userData'), ipcMain)
   parser = new Parser(store)
   tailLog(store, logPath, parser.parse.bind(parser))

@@ -1,6 +1,6 @@
 {
   "name": "deckmaster",
-  "version": "2018.8.20.2",
+  "version": "2018.8.20",
   "author": "Fugi <Fugiman47@gmail.com>",
   "description": "Deckmaster Twitch Extension",
   "repository": "github:fugiman/deckmaster",
@@ -16,7 +16,7 @@
     "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
     "postinstall": "",
-    "release": "build"
+    "release": "node .electron-vue/build.js && electron-builder"
   },
   "build": {
     "productName": "Deckmaster",

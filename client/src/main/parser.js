@@ -54,7 +54,7 @@ export default class Parser {
       this.timeout = setTimeout(() => {
         this.store.commit('statusUpdate', { logupdate: false })
         this.store.dispatch('disableExtension')
-      }, 61000)
+      }, 601000)
     }
 
     // Add the fresh data
@@ -99,7 +99,7 @@ export default class Parser {
           this.handleGameState(m)
         }
         if (m.type === 'GREMessageType_IntermissionReq') {
-          this.handleIntermission(m)
+          this.handleIntermission()
         }
       })
     }
@@ -112,10 +112,14 @@ export default class Parser {
     if ('cardsOpened' in o) {
       this.handleBooster(o.cardsOpened)
     }
+    if ('params' in o && o.params.messageName === 'Client.SceneChange') {
+      this.handleIntermission()
+    }
   }
 
   handleGameState(m) {
     if (m.gameStateMessage.type === 'GameStateType_Full') {
+      this.handleIntermission()
       this.store.commit('statusUpdate', { gameongoing: true })
       this.seatID = m.systemSeatIds[0]
     }
@@ -235,7 +239,7 @@ export default class Parser {
     this.updateStore()
   }
 
-  handleIntermission(m) {
+  handleIntermission() {
     this.gameObjects.clear()
     this.gameState = _.cloneDeep(this.defaultGameState)
     this.updateStore()
