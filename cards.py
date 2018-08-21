@@ -67,20 +67,21 @@ with open("cards.json", "w") as f:
 # Add cards to cards_db, using scryfall to get additional info
 for card in cards_json:
     id = str(card["grpid"])
-    if id not in cards_db and card["set"] != "ANA":
+    if id not in cards_db and card["CollectorNumber"] != "":
         set = ("t" if card["isToken"] else "") + set_overrides.get(card["set"], card["set"].lower())
         sfd = requests.get("https://api.scryfall.com/cards/{}/{}".format(set, card["CollectorNumber"])).json()
-        cards_db[id] = {
-            "ArenaID": id,
-            "ScryfallID": sfd["id"],
-            "Set": sfd["set"],
-            "CollectorNumber": sfd["collector_number"],
-            "Name": sfd["name"],
-            "Rarity": sfd["rarity"],
-            "CMC": str(int(sfd["cmc"])),
-            "Colors": "".join(sfd["color_identity"]),
-            "DualSided": str(sfd["layout"] in ("transform",)).lower(),
-        }
+        if "id" in sfd:
+            cards_db[id] = {
+                "ArenaID": id,
+                "ScryfallID": sfd["id"],
+                "Set": sfd["set"],
+                "CollectorNumber": sfd["collector_number"],
+                "Name": sfd["name"],
+                "Rarity": sfd["rarity"],
+                "CMC": str(int(sfd["cmc"])),
+                "Colors": "".join(sfd["color_identity"]),
+                "DualSided": str(sfd["layout"] in ("transform",)).lower(),
+            }
 
 # Export cards db
 with open("cards.csv", "w") as f:
@@ -123,12 +124,18 @@ for card in cards_db.values():
                 dl(url+".jpg", path)
 
 # Update card db in client application
-with open("client/types/cards.go", "w") as f:
-    f.write("package types\n\nvar AllCards = map[int]Card{\n")
+# with open("client/types/cards.go", "w") as f:
+#     f.write("package types\n\nvar AllCards = map[int]Card{\n")
+#     for key in sorted(cards_db.keys()):
+#         d = cards_db[key]
+#         f.write('\t{ArenaID}: Card{{"{ArenaID}", "{Name}", "{Set}", {CollectorNumber}, "{Colors}", "{Rarity}", {CMC}, {DualSided}}},\n'.format(**d))
+#     f.write("}\n")
+with open("client/src/main/cards.js", "w") as f:
+    f.write("const AllCards = new Map([\n")
     for key in sorted(cards_db.keys()):
         d = cards_db[key]
-        f.write('\t{ArenaID}: Card{{"{ArenaID}", "{Name}", "{Set}", {CollectorNumber}, "{Colors}", "{Rarity}", {CMC}, {DualSided}}},\n'.format(**d))
-    f.write("}\n")
+        f.write('\t[{ArenaID}, {{ID: "{ArenaID}", name: "{Name}", set: "{Set}", number: {CollectorNumber}, color: "{Colors}", rarity: "{Rarity}", cmc: {CMC}, dualSided: {DualSided}}}],\n'.format(**d))
+    f.write("])\n\nexport default AllCards\n")
 
 from collections import defaultdict
 failedcsv = defaultdict(list)

@@ -22,3 +22,4 @@ Thumbs.db
 cards.csv
 cards.json
 netlify.toml
+node_modules

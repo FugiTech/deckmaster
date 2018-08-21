@@ -8,12 +8,17 @@
   },
   "dependencies": {
     "vue": "^2.5.16",
-    "vuetify": "^1.0.17"
+    "vuetify": "^1.0.17",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.0-beta.10",
     "@vue/cli-service": "^3.0.0-beta.10",
     "vue-template-compiler": "^2.5.13"
   },
-  "browserslist": ["> 1%", "last 2 versions", "not ie <= 8"]
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
 }
