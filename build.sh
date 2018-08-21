@@ -26,6 +26,7 @@ mv config/dist dist/twitch/config
 mv overlay/dist dist/twitch/overlay
 mv mobile/dist dist/twitch/mobile
 
+
 cd dist/twitch && zip -r ../twitch.zip * && cd ../..
 
 # Build netlify bundle

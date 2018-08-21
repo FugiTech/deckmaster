@@ -6,22 +6,22 @@ from urllib.request import urlretrieve
 # Map from Arena set name -> Scryfall set name
 set_overrides = {
     "DAR": "dom",
-    "ANA": "mtga"
+    "ANA": "mtga",
 }
 
 # Map from Scryfall language code -> Twitch language code
 languages = {
     "en": "en", # English
-    # "es": "es", # Spanish
-    # "fr": "fr", # French
-    # "de": "de", # German
-    # "it": "it", # Italian
-    # "pt": "pt", # Portuguese
-    # "ja": "ja", # Japanese
-    # "ko": "ko", # Korean
-    # "ru": "ru", # Russian
-    # # Twitch just gives us "zh" for both, so just use Simplified
-    # "zhs": "zh", # Simplified Chinese
+    "es": "es", # Spanish
+    "fr": "fr", # French
+    "de": "de", # German
+    "it": "it", # Italian
+    "pt": "pt", # Portuguese
+    "ja": "ja", # Japanese
+    "ko": "ko", # Korean
+    "ru": "ru", # Russian
+    # Twitch just gives us "zh" for both, so just use Simplified
+    "zhs": "zh", # Simplified Chinese
     # #"zht": "zh", # Traditional Chinese
 }
 
@@ -91,12 +91,14 @@ with open("cards.csv", "w") as f:
         writer.writerow(cards_db[key])
 
 # Download images
+failed = []
 def dl(url, path):
     try:
         urlretrieve(url, path)
         print("{} => {}".format(url, path))
     except:
         print("{} ... FAILED!".format(url))
+        failed.append(url)
 
 for card in cards_db.values():
     for [slang, tlang] in languages.items():
@@ -134,3 +136,17 @@ with open("client/src/main/cards.js", "w") as f:
         d = cards_db[key]
         f.write('\t[{ArenaID}, {{ID: "{ArenaID}", name: "{Name}", set: "{Set}", number: {CollectorNumber}, color: "{Colors}", rarity: "{Rarity}", cmc: {CMC}, dualSided: {DualSided}}}],\n'.format(**d))
     f.write("])\n\nexport default AllCards\n")
+
+from collections import defaultdict
+failedcsv = defaultdict(list)
+for url in failed:
+    p = url.split('/')
+    lang, set, cid = p[5], p[6], p[7]
+    cid = cid.rstrip(".jpg")
+    failedcsv[(set, cid)].append(lang)
+
+with open("cards.missing.csv", "w") as f:
+    w = csv.writer(f)
+    w.writerow(["set", "cid", "languages"])
+    for k, v in failedcsv.items():
+        w.writerow([k[0], k[1], " ".join(v)])
