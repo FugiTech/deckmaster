@@ -86,6 +86,7 @@ export default class Parser {
           end = +m[1]
         } else {
           console.log('Unexpected error parsing JSON!', e)
+          this.buffer = this.buffer.substring(1)
           return
         }
       }
@@ -314,6 +315,7 @@ export default class Parser {
     // order of sorts goes from least important -> most important
     return _.chain(cards)
       .map(c => +c)
+      .sortBy(c => AllCards.get(c).name)
       .sortBy(c => AllCards.get(c).cmc)
       .sortBy(c => {
         let d = AllCards.get(c)

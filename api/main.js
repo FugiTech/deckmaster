@@ -163,7 +163,7 @@ app.post('/vote', (req, res) => {
   if (wsByUID.has(token.channel_id)) {
     let ws = wsByUID.get(token.channel_id)
     let vote = {
-      ip: req.ip,
+      ip: token.opaque_user_id,
       user: token.user_id,
       draftID: req.body.draft_id,
       card: req.body.card,

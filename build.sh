@@ -13,6 +13,8 @@
 # esc, :wq, enter, "exit"
 # >docker-machine restart
 
+set -e
+
 rm -rf dist
 mkdir dist
 mkdir dist/twitch
