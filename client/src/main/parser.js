@@ -402,7 +402,7 @@ export default class Parser {
     let doubleSided = {}
     zones.forEach(z => {
       z.Cards.forEach(c => {
-        if (AllCards.has(c) && AllCards.get(c).DualSided) doubleSided[c] = true
+        if (AllCards.has(c) && AllCards.get(c).dualSided) doubleSided[c] = true
       })
     })
 
