@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container fluid fill-height>
     <v-layout column>
       <v-layout row class="mb-2" v-for="r in releases" :key="r.name">
         <v-flex xs2 class="text-xs-right pr-2">{{ r.name }}</v-flex>
@@ -45,7 +45,6 @@ export default {
 <style scoped>
 .container {
   overflow-y: auto;
-  height: 100%;
 }
 
 .layout.row {

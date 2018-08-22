@@ -310,7 +310,19 @@ export default class Parser {
 
   sort(cards) {
     const lands = ['Plains', 'Island', 'Swamp', 'Mountain', 'Forest']
-    const rarityOrder = ['mythic', 'rare', 'uncommon', 'common', 'land']
+    const duallands = [
+      'Cinder Barrens',
+      'Forsaken Sanctuary',
+      'Foul Orchard',
+      'Highland Lake',
+      'Meandering River',
+      'Stone Quarry',
+      'Submerged Boneyard',
+      'Timber Gorge',
+      'Tranquil Expanse',
+      'Woodland Stream',
+    ]
+    const rarityOrder = ['mythic', 'rare', 'uncommon', 'common', 'dualland', 'land']
     const colorOrder = [1, 2, 4, 8, 16, 3, 5, 6, 10, 12, 20, 24, 9, 17, 18, 7, 14, 28, 25, 19, 13, 26, 21, 11, 22, 15, 30, 29, 27, 23, 31, 0]
     // order of sorts goes from least important -> most important
     return _.chain(cards)
@@ -329,7 +341,10 @@ export default class Parser {
       })
       .sortBy(c => {
         let d = AllCards.get(c)
-        return _.indexOf(rarityOrder, _.includes(lands, d.name) ? 'land' : d.rarity)
+        let rarity = d.rarity
+        if (_.includes(duallands, d.name)) rarity = 'dualland'
+        if (_.includes(lands, d.name)) rarity = 'land'
+        return _.indexOf(rarityOrder, rarity)
       })
       .value()
   }

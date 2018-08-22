@@ -219,7 +219,7 @@ html
   height: 15px;
   min-width: 0;
 }
-.content {
+.v-content {
   max-height: 100vh;
 }
 </style>

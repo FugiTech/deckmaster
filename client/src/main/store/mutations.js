@@ -1,6 +1,7 @@
 import { app } from 'electron'
 import { URL } from 'url'
 import nanoid from 'nanoid'
+import jwt from 'jsonwebtoken'
 import _ from 'lodash'
 import AllCards from '../cards'
 
@@ -9,7 +10,7 @@ const mutations = {
     state.version = 'v' + app.getVersion()
   },
   setToken(state, token) {
-    let d = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
+    let d = jwt.decode(token)
     state.token = { jwt: token, channelID: d['channel_id'], expires: d['exp'] }
   },
   fakeLogin(state) {

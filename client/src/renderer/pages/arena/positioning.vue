@@ -29,7 +29,6 @@
 export default {
   data: function() {
     return {
-      channelLogin: '',
       now: new Date(),
       overlayStyle: Object.assign({}, this.$store.state.overlayPositioning),
       movefns: [this.null, this.null],
@@ -41,7 +40,8 @@ export default {
   },
   computed: {
     previewImage() {
-      return `https://static-cdn.jtvnw.net/previews-ttv/live_user_${this.channelLogin}-1424x800.jpg?ts=${+this.now}`
+      let login = this.$store.state.oauth ? this.$store.state.oauth.username.toLowerCase() : ''
+      return `https://static-cdn.jtvnw.net/previews-ttv/live_user_${login}-1424x800.jpg?ts=${+this.now}`
     },
   },
   mounted() {
@@ -77,15 +77,17 @@ export default {
       this.movefns[1](e, true)
     },
     distance(e, vertical) {
-      return vertical ? (100 * (e['pageY'] - this['startY'])) / this.$refs.container['clientHeight'] : (100 * (e['pageX'] - this['startX'])) / this.$refs.container['clientWidth']
+      return vertical ? 100 * (e['pageY'] - this['startY']) / this.$refs.container['clientHeight'] : 100 * (e['pageX'] - this['startX']) / this.$refs.container['clientWidth']
     },
 
     null(e, vertical) {},
     move(e, vertical) {
-      this.overlayStyle[vertical ? 'top' : 'left'] = this.clamp(this.startStyle[vertical ? 'top' : 'left'] + this.distance(e, vertical), 0, 100 - this.startStyle[vertical ? 'height' : 'width']) + '%'
+      this.overlayStyle[vertical ? 'top' : 'left'] =
+        this.clamp(this.startStyle[vertical ? 'top' : 'left'] + this.distance(e, vertical), 0, 100 - this.startStyle[vertical ? 'height' : 'width']) + '%'
     },
     simple(e, vertical) {
-      this.overlayStyle[vertical ? 'height' : 'width'] = this.clamp(this.startStyle[vertical ? 'height' : 'width'] + this.distance(e, vertical), 10, 100 - this.startStyle[vertical ? 'top' : 'left']) + '%'
+      this.overlayStyle[vertical ? 'height' : 'width'] =
+        this.clamp(this.startStyle[vertical ? 'height' : 'width'] + this.distance(e, vertical), 10, 100 - this.startStyle[vertical ? 'top' : 'left']) + '%'
     },
     complex(e, vertical) {
       let pos = this.clamp(this.startStyle[vertical ? 'top' : 'left'] + this.distance(e, vertical), 0, this.startStyle[vertical ? 'height' : 'width'] - 10)
