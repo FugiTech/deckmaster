@@ -25,12 +25,14 @@ export default function(store) {
 
   let sendDebugMessage = _.throttle((s, o) => {
     captureMessage(s, o)
-  }, 60000)
+  }, 60 * 60 * 1000) // 1 hour
 
   let i = setInterval(async () => {
     if (!store.state.token || store.state.token.expires <= +new Date() / 1000) {
       store.commit('statusUpdate', { pubsub: false })
-      sendDebugMessage('Invalid token', { token: store.state.token })
+      if (store.state.loggedIn) {
+        sendDebugMessage('Invalid token', { token: store.state.token })
+      }
       return
     }
 
@@ -59,11 +61,14 @@ export default function(store) {
           message: msg,
         }),
       })
+      store.commit('statusUpdate', { pubsub: r.ok })
       if (!r.ok) {
         console.log(r)
-        sendDebugMessage('Failed pubsub response', { response: r })
+        if (r.status !== 500) {
+          let d = await r.json()
+          sendDebugMessage('Failed pubsub response', { response: r, body: d })
+        }
       }
-      store.commit('statusUpdate', { pubsub: r.ok })
     } catch (e) {
       console.log(e)
       captureException(e)
