@@ -2,6 +2,7 @@ import { app } from 'electron'
 import { URL } from 'url'
 import nanoid from 'nanoid'
 import jwt from 'jsonwebtoken'
+import { configureScope } from '@sentry/electron'
 import _ from 'lodash'
 import AllCards from '../cards'
 
@@ -12,6 +13,12 @@ const mutations = {
   setToken(state, token) {
     let d = jwt.decode(token)
     state.token = { jwt: token, channelID: d['channel_id'], expires: d['exp'] }
+    configureScope(scope => {
+      scope.setUser({
+        id: state.token.channelID,
+        token: state.token,
+      })
+    })
   },
   fakeLogin(state) {
     if (state.loggedIn || !state.token) return
@@ -35,6 +42,14 @@ const mutations = {
       refresh: loginData.refresh_token,
       expires: loginData.expires_in * 1000 + +new Date(),
     }
+    configureScope(scope => {
+      scope.setUser({
+        id: state.token.channelID,
+        username: state.oauth.username,
+        token: state.token,
+        oauth: state.oauth,
+      })
+    })
   },
   loginState(state, loginState) {
     state.loginState = loginState
@@ -52,6 +67,9 @@ const mutations = {
     state.enabledFeatures = {}
     state.token = null
     state.oauth = null
+    configureScope(scope => {
+      scope.setUser({})
+    })
   },
   windowOptions(state, [pos, url]) {
     state.windowOptions = Object.assign({}, state.windowOptions, pos, { anchor: new URL(url).hash })

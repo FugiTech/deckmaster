@@ -1,11 +1,19 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { autoUpdater } from 'electron-updater'
+import { init } from '@sentry/electron'
 import path from 'path'
 import _ from 'lodash'
 import storeFactory from './store'
 import tailLog from './tail'
 import publish from './publisher'
 import Parser from './parser'
+
+init({
+  dsn: 'https://0680c2cdbb4c4cdb820e9c9784fc5dc8@sentry.io/1268077',
+  release: `deckmaster-${app.getVersion()}`,
+  captureUnhandledRejections: true,
+  autoBreadcrumbs: true,
+})
 
 let mainWindow, store, parser
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`

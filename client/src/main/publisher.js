@@ -1,6 +1,7 @@
 import fetch from 'node-fetch'
 import WebSocket from 'ws'
-import { client_id } from './vars'
+import _ from 'lodash'
+import { client_id, captureMessage, captureException } from './vars'
 
 export default function(store) {
   let devPublish = () => {}
@@ -22,9 +23,14 @@ export default function(store) {
     }
   }
 
+  let sendDebugMessage = _.throttle((s, o) => {
+    captureMessage(s, o)
+  }, 60000)
+
   let i = setInterval(async () => {
     if (!store.state.token || store.state.token.expires <= +new Date() / 1000) {
       store.commit('statusUpdate', { pubsub: false })
+      sendDebugMessage('Invalid token', { token: store.state.token })
       return
     }
 
@@ -53,10 +59,14 @@ export default function(store) {
           message: msg,
         }),
       })
-      if (!r.ok) console.log(r)
+      if (!r.ok) {
+        console.log(r)
+        sendDebugMessage('Failed pubsub response', { response: r })
+      }
       store.commit('statusUpdate', { pubsub: r.ok })
     } catch (e) {
       console.log(e)
+      captureException(e)
       store.commit('statusUpdate', { pubsub: false })
     }
   }, 1000)

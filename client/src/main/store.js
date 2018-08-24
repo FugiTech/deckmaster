@@ -3,6 +3,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VuexPersist from 'vuex-persistfile'
 import WebSocket from 'ws'
+import { configureScope } from '@sentry/electron'
 import getters from './store/getters'
 import mutations from './store/mutations'
 import actions from './store/actions'
@@ -86,6 +87,14 @@ export default function(path, ipc) {
       )
     } catch (e) {}
   }
+  configureScope(scope => {
+    scope.setUser({
+      id: store.state.token ? store.state.token.channelID : undefined,
+      username: store.state.oauth ? store.state.oauth.username : undefined,
+      token: store.state.token,
+      oauth: store.state.oauth,
+    })
+  })
 
   let clients = []
   store.subscribe((mutation, state) => {

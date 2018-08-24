@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import nanoid from 'nanoid'
+import { captureException } from './vars'
 import AllCards from './cards'
 
 export default class Parser {
@@ -81,12 +82,16 @@ export default class Parser {
         let m // regex match
         if ((m = /Unexpected end of JSON input/.exec(e.message)) !== null) {
           return // We don't have enough data to do anything yet
-        } else if ((m = /Unexpected token .*? in JSON at position (\d+)/.exec(e.message)) !== null) {
+        } else if ((m = /Unexpected .*? in JSON at position (\d+)/.exec(e.message)) !== null) {
           // We have too much data, update end
           end = +m[1]
         } else {
           console.log('Unexpected error parsing JSON!', e)
+          captureException(e, {
+            extra: { buffer: this.buffer.substring(0, 100) },
+          })
           this.buffer = this.buffer.substring(1)
+          this.parse('')
           return
         }
       }
@@ -174,7 +179,7 @@ export default class Parser {
         } else {
           if (attachments.has(id)) {
             let counts = _.countBy([].concat(ol, oc, oo))
-            let key = `${id}:${counts[id] || 0}`
+            let key = `${card.grpId}:${counts[card.grpId] || 0}`
             oa[key] = this.sort(attachments.get(id))
           }
           if (_.includes(card.cardTypes, 'CardType_Land')) {
