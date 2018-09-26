@@ -316,6 +316,7 @@ export default class Parser {
   sort(cards) {
     const lands = ['Plains', 'Island', 'Swamp', 'Mountain', 'Forest']
     const duallands = [
+      // M19
       'Cinder Barrens',
       'Forsaken Sanctuary',
       'Foul Orchard',
@@ -326,6 +327,12 @@ export default class Parser {
       'Timber Gorge',
       'Tranquil Expanse',
       'Woodland Stream',
+      // GRN
+      'Boros Guildgate',
+      'Dimir Guildgate',
+      'Golgari Guildgate',
+      'Izzet Guildgate',
+      'Selesnya Guildgate',
     ]
     const rarityOrder = ['mythic', 'rare', 'uncommon', 'common', 'dualland', 'land']
     const colorOrder = [1, 2, 4, 8, 16, 3, 5, 6, 10, 12, 20, 24, 9, 17, 18, 7, 14, 28, 25, 19, 13, 26, 21, 11, 22, 15, 30, 29, 27, 23, 31, 0]
