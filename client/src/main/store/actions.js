@@ -108,7 +108,7 @@ export default {
       body: JSON.stringify({
         data: {
           overlay: { 1: { active: true, id: client_id } },
-          component: { 1: { active: false }, 2: { active: false } },
+          // component: { 1: { active: false }, 2: { active: false } },
         },
       }),
     })
