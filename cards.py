@@ -1,37 +1,48 @@
-import sys, os, io, json, csv, zlib
+import sys, os, io, json, csv, zlib, copy
 import requests
 import unitypack
 from urllib.request import urlretrieve
 
 # Map from Arena set name -> Scryfall set name
-set_overrides = {
-    "DAR": "dom",
-    "ANA": "mtga",
-}
+set_overrides = {"DAR": "dom"}
 
 # Map from Scryfall language code -> Twitch language code
 languages = {
-    "en": "en", # English
-    "es": "es", # Spanish
-    "fr": "fr", # French
-    "de": "de", # German
-    "it": "it", # Italian
-    "pt": "pt", # Portuguese
-    "ja": "ja", # Japanese
-    "ko": "ko", # Korean
-    "ru": "ru", # Russian
+    "en": "en",  # English
+    "es": "es",  # Spanish
+    "fr": "fr",  # French
+    "de": "de",  # German
+    "it": "it",  # Italian
+    "pt": "pt",  # Portuguese
+    "ja": "ja",  # Japanese
+    "ko": "ko",  # Korean
+    "ru": "ru",  # Russian
     # Twitch just gives us "zh" for both, so just use Simplified
-    "zhs": "zh", # Simplified Chinese
+    "zhs": "zh",  # Simplified Chinese
     # #"zht": "zh", # Traditional Chinese
 }
 
 # Load data about cards we've seen before
 cards_db = {}
-if os.path.exists("cards.csv"):
-    with open("cards.csv", "r") as f:
-        reader = csv.DictReader(f)
-        for card in reader:
-            cards_db[card["ArenaID"]] = card
+scryfall_data = requests.get(
+    "https://archive.scryfall.com/json/scryfall-all-cards.json"
+).json()
+for o in scryfall_data:
+    if o["object"] != "card":
+        continue
+    cards_db[(o["set"], o["collector_number"], o["lang"])] = {
+        "ScryfallID": o["id"],
+        "Set": o["set"],
+        "CollectorNumber": o["collector_number"],
+        "Name": o["name"],
+        "Rarity": o["rarity"],
+        "CMC": str(int(o["cmc"])),
+        "Colors": "".join(o["color_identity"]),
+        "DualSided": str(o["layout"] in ("transform",)).lower(),
+        "Images": [o["image_uris"]]
+        if "image_uris" in o
+        else [cf["image_uris"] for cf in o["card_faces"]],
+    }
 
 # Download the latest cards.json from wizards
 CDN_URL = "http://mtga-assets.dl.wizards.com"
@@ -41,10 +52,14 @@ if version == "":
     sys.exit("usage: python cards.py <mtga version>")
 
 external_mtga = requests.get("{}/External_{}.mtga".format(CDN_URL, version))
-manifest_mtga = requests.get("{}/Manifest_{}.mtga".format(CDN_URL, external_mtga.text.strip()))
-if manifest_mtga.content[0] != '{':
+manifest_mtga = requests.get(
+    "{}/Manifest_{}.mtga".format(CDN_URL, external_mtga.text.strip())
+)
+if manifest_mtga.content[0] != "{":
     # deal with case when content remains compressed
-    manifest_mtga_json = json.loads(zlib.decompress(manifest_mtga.content, 16+zlib.MAX_WBITS).decode('utf-8'))
+    manifest_mtga_json = json.loads(
+        zlib.decompress(manifest_mtga.content, 16 + zlib.MAX_WBITS).decode("utf-8")
+    )
 else:
     manifest_mtga_json = manifest_mtga.json()
 
@@ -56,7 +71,7 @@ for a in manifest_mtga_json["Assets"]:
 if data_cards_name is None:
     sys.exit("Could not find card data")
 data_cards = requests.get("{}/{}".format(CDN_URL, data_cards_name))
-buf = io.BytesIO(zlib.decompress(data_cards.content, 16+zlib.MAX_WBITS))
+buf = io.BytesIO(zlib.decompress(data_cards.content, 16 + zlib.MAX_WBITS))
 buf.name = data_cards_name
 bundle = unitypack.load(buf)
 cards_file = list(bundle.assets[0].objects.values())[1]
@@ -64,85 +79,67 @@ cards_json = json.loads(cards_file.read().bytes)
 with open("cards.json", "w") as f:
     f.write(cards_file.read().bytes)
 
-# Add cards to cards_db, using scryfall to get additional info
-for card in cards_json:
-    id = str(card["grpid"])
-    if id not in cards_db and card["CollectorNumber"] != "":
-        set = ("t" if card["isToken"] else "") + set_overrides.get(card["set"], card["set"].lower())
-        sfd = requests.get("https://api.scryfall.com/cards/{}/{}".format(set, card["CollectorNumber"])).json()
-        if "id" in sfd:
-            cards_db[id] = {
-                "ArenaID": id,
-                "ScryfallID": sfd["id"],
-                "Set": sfd["set"],
-                "CollectorNumber": sfd["collector_number"],
-                "Name": sfd["name"],
-                "Rarity": sfd["rarity"],
-                "CMC": str(int(sfd["cmc"])),
-                "Colors": "".join(sfd["color_identity"]),
-                "DualSided": str(sfd["layout"] in ("transform",)).lower(),
-            }
-
-# Export cards db
-with open("cards.csv", "w") as f:
-    writer = csv.DictWriter(f, fieldnames=["ArenaID", "ScryfallID", "Set", "CollectorNumber", "Name", "Rarity", "CMC", "Colors", "DualSided"])
-    writer.writeheader()
-    for key in sorted(cards_db.keys()):
-        writer.writerow(cards_db[key])
-
 # Download images
 failed = []
+all_cards = []
+
+
 def dl(url, path):
     try:
         urlretrieve(url, path)
         print("{} => {}".format(url, path))
     except:
         print("{} ... FAILED!".format(url))
-        failed.append(url)
 
-for card in cards_db.values():
-    for [slang, tlang] in languages.items():
-        folder = "cards/{}/{:02d}".format(tlang, int(card["ArenaID"])%20)
-        if not os.path.exists(folder):
-            os.makedirs(folder)
 
-        url = "https://img.scryfall.com/cards/normal/{}/{}/{}".format(slang, card["Set"], card["CollectorNumber"])
-        if " // " in card["Name"]:
-            path = "{}/{}.jpg".format(folder, card["ArenaID"])
-            if not os.path.exists(path):
-                dl(url+"a.jpg", path)
-        elif card["DualSided"] == "true":
-            path = "{}/{}.jpg".format(folder, card["ArenaID"])
-            if not os.path.exists(path):
-                dl(url+"a.jpg", path)
-            path = "{}/{}_back.jpg".format(folder, card["ArenaID"])
-            if not os.path.exists(path):
-                dl(url+"b.jpg", path)
-        else:
-            path = "{}/{}.jpg".format(folder, card["ArenaID"])
-            if not os.path.exists(path):
-                dl(url+".jpg", path)
+for card in cards_json:
+    id = str(card["grpid"])
+    if card["CollectorNumber"] != "":
+        _set = ("t" if card["isToken"] else "") + set_overrides.get(
+            card["set"], card["set"].lower()
+        )
+        _num = card["CollectorNumber"]
+        if _set == "tana":
+            _set = ana
+            _num = "T" + _num
+
+        for [slang, tlang] in languages.items():
+            c = cards_db.get((_set, _num, slang))
+            if c is None:
+                failed.append((slang, _set, _num))
+                continue
+            if tlang == "en":
+                cc = copy.copy(c)
+                cc["ArenaID"] = id
+                all_cards.append(cc)
+
+            folder = "cards/{}/{:02d}".format(tlang, int(id) % 20)
+            if not os.path.exists(folder):
+                os.makedirs(folder)
+
+            for (images, path) in zip(
+                c["Images"],
+                ["{}/{}.jpg".format(folder, id), "{}/{}_back.jpg".format(folder, id)],
+            ):
+                if not os.path.exists(path):
+                    dl(images["large"], path)
+
 
 # Update card db in client application
-# with open("client/types/cards.go", "w") as f:
-#     f.write("package types\n\nvar AllCards = map[int]Card{\n")
-#     for key in sorted(cards_db.keys()):
-#         d = cards_db[key]
-#         f.write('\t{ArenaID}: Card{{"{ArenaID}", "{Name}", "{Set}", {CollectorNumber}, "{Colors}", "{Rarity}", {CMC}, {DualSided}}},\n'.format(**d))
-#     f.write("}\n")
 with open("client/src/main/cards.js", "w") as f:
     f.write("const AllCards = new Map([\n")
-    for key in sorted(cards_db.keys()):
-        d = cards_db[key]
-        f.write('\t[{ArenaID}, {{ID: "{ArenaID}", name: "{Name}", set: "{Set}", number: {CollectorNumber}, color: "{Colors}", rarity: "{Rarity}", cmc: {CMC}, dualSided: {DualSided}}}],\n'.format(**d))
+    for d in sorted(all_cards, key=lambda c: c["ArenaID"]):
+        f.write(
+            '\t[{ArenaID}, {{ID: "{ArenaID}", name: "{Name}", set: "{Set}", number: {CollectorNumber}, color: "{Colors}", rarity: "{Rarity}", cmc: {CMC}, dualSided: {DualSided}}}],\n'.format(
+                **d
+            )
+        )
     f.write("])\n\nexport default AllCards\n")
 
 from collections import defaultdict
+
 failedcsv = defaultdict(list)
-for url in failed:
-    p = url.split('/')
-    lang, set, cid = p[5], p[6], p[7]
-    cid = cid.rstrip(".jpg")
+for (lang, set, cid) in failed:
     failedcsv[(set, cid)].append(lang)
 
 with open("cards.missing.csv", "w") as f:

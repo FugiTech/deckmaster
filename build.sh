@@ -33,7 +33,6 @@ cd dist/twitch && zip -r ../twitch.zip * && cd ../..
 
 # Build netlify bundle
 cp -r cards dist/netlify/cards
-cp -r dist/netlify/cards/en/* dist/netlify/cards
 cp logo.png dist/netlify
 cp deckmaster-setup-2018.8.20.exe dist/netlify/deckmaster-windows-4.0-amd64.exe
 echo "xxxxxx" > dist/netlify/version
