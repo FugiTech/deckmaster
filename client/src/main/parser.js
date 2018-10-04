@@ -339,10 +339,10 @@ export default class Parser {
     // order of sorts goes from least important -> most important
     return _.chain(cards)
       .map(c => +c)
-      .sortBy(c => AllCards.get(c).name)
-      .sortBy(c => AllCards.get(c).cmc)
+      .sortBy(c => (AllCards.get(c) || {}).name)
+      .sortBy(c => (AllCards.get(c) || {}).cmc)
       .sortBy(c => {
-        let d = AllCards.get(c)
+        let d = AllCards.get(c) || {}
         let v = 0
         if (_.includes(d.color, 'W')) v |= 1
         if (_.includes(d.color, 'U')) v |= 2
@@ -352,7 +352,7 @@ export default class Parser {
         return _.indexOf(colorOrder, v)
       })
       .sortBy(c => {
-        let d = AllCards.get(c)
+        let d = AllCards.get(c) || {}
         let rarity = d.rarity
         if (_.includes(duallands, d.name)) rarity = 'dualland'
         if (_.includes(lands, d.name)) rarity = 'land'

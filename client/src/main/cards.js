@@ -1182,7 +1182,7 @@ const AllCards = new Map([
 	[68493, {ID: "68493", name: "Chemister's Insight", set: "grn", number: 32, color: "U", rarity: "uncommon", cmc: 4, dualSided: false}],
 	[68494, {ID: "68494", name: "Citywatch Sphinx", set: "grn", number: 33, color: "U", rarity: "uncommon", cmc: 6, dualSided: false}],
 	[68495, {ID: "68495", name: "Dazzling Lights", set: "grn", number: 34, color: "U", rarity: "common", cmc: 1, dualSided: false}],
-	[68496, {ID: "68496", name: "Devious Cover-up", set: "grn", number: 35, color: "U", rarity: "common", cmc: 4, dualSided: false}],
+	[68496, {ID: "68496", name: "Devious Cover-Up", set: "grn", number: 35, color: "U", rarity: "common", cmc: 4, dualSided: false}],
 	[68497, {ID: "68497", name: "Dimir Informant", set: "grn", number: 36, color: "U", rarity: "common", cmc: 3, dualSided: false}],
 	[68498, {ID: "68498", name: "Disdainful Stroke", set: "grn", number: 37, color: "U", rarity: "common", cmc: 2, dualSided: false}],
 	[68499, {ID: "68499", name: "Dream Eater", set: "grn", number: 38, color: "U", rarity: "mythic", cmc: 6, dualSided: false}],
@@ -1486,6 +1486,9 @@ const AllCards = new Map([
 	[69117, {ID: "69117", name: "Goblin Gang Leader", set: "ana", number: 40, color: "R", rarity: "uncommon", cmc: 4, dualSided: false}],
 	[69118, {ID: "69118", name: "Ogre Painbringer", set: "ana", number: 42, color: "R", rarity: "rare", cmc: 5, dualSided: false}],
 	[69119, {ID: "69119", name: "Treetop Warden", set: "ana", number: 48, color: "G", rarity: "common", cmc: 2, dualSided: false}],
+	[69449, {ID: "69449", name: "Ral, Izzet Viceroy", set: "med", number: GR5, color: "RU", rarity: "mythic", cmc: 5, dualSided: false}],
+	[69450, {ID: "69450", name: "Vraska, Golgari Queen", set: "med", number: GR8, color: "BG", rarity: "mythic", cmc: 4, dualSided: false}],
+	[69451, {ID: "69451", name: "Teferi, Hero of Dominaria", set: "med", number: GR6, color: "UW", rarity: "mythic", cmc: 5, dualSided: false}],
 ])
 
 export default AllCards

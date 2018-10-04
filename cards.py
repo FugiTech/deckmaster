@@ -55,29 +55,39 @@ external_mtga = requests.get("{}/External_{}.mtga".format(CDN_URL, version))
 manifest_mtga = requests.get(
     "{}/Manifest_{}.mtga".format(CDN_URL, external_mtga.text.strip())
 )
-if manifest_mtga.content[0] != "{":
-    # deal with case when content remains compressed
-    manifest_mtga_json = json.loads(
-        zlib.decompress(manifest_mtga.content, 16 + zlib.MAX_WBITS).decode("utf-8")
-    )
-else:
-    manifest_mtga_json = manifest_mtga.json()
+manifest_mtga_json = json.loads(
+    zlib.decompress(manifest_mtga.content, 16 + zlib.MAX_WBITS).decode("utf-8")
+)
 
-data_cards_name = None
+bundles = {"data_cards": None, "data_loc": None}
+
 for a in manifest_mtga_json["Assets"]:
-    if a["Name"].startswith("data_cards_"):
-        data_cards_name = a["Name"]
-        break
-if data_cards_name is None:
-    sys.exit("Could not find card data")
-data_cards = requests.get("{}/{}".format(CDN_URL, data_cards_name))
-buf = io.BytesIO(zlib.decompress(data_cards.content, 16 + zlib.MAX_WBITS))
-buf.name = data_cards_name
-bundle = unitypack.load(buf)
-cards_file = list(bundle.assets[0].objects.values())[1]
-cards_json = json.loads(cards_file.read().bytes)
+    for k in bundles.keys():
+        if a["Name"].startswith(k):
+            d = requests.get("{}/{}".format(CDN_URL, a["Name"]))
+            buf = io.BytesIO(zlib.decompress(d.content, 16 + zlib.MAX_WBITS))
+            buf.name = a["Name"]
+            bundles[k] = unitypack.load(buf)
+
+for (k, v) in bundles.items():
+    if v is None:
+        sys.exit("Could not find {} bundle".format(k))
+
+cards_list = json.loads(
+    list(bundles["data_cards"].assets[0].objects.values())[1].read().bytes
+)
+loc_list = json.loads(
+    list(bundles["data_loc"].assets[0].objects.values())[0].read().bytes
+)
+
 with open("cards.json", "w") as f:
-    f.write(cards_file.read().bytes)
+    f.write(json.dumps(cards_list))
+
+loc = {}
+for l in loc_list:
+    if l["langkey"] == "EN":
+        for v in l["keys"]:
+            loc[v["id"]] = v["text"]
 
 # Download images
 failed = []
@@ -92,7 +102,7 @@ def dl(url, path):
         print("{} ... FAILED!".format(url))
 
 
-for card in cards_json:
+for card in cards_list:
     id = str(card["grpid"])
     if card["CollectorNumber"] != "":
         _set = ("t" if card["isToken"] else "") + set_overrides.get(
@@ -102,11 +112,13 @@ for card in cards_json:
         if _set == "tana":
             _set = ana
             _num = "T" + _num
+        if _num.startswith("GR"):
+            _set = "med"
 
         for [slang, tlang] in languages.items():
             c = cards_db.get((_set, _num, slang))
             if c is None:
-                failed.append((slang, _set, _num))
+                failed.append((slang, _set, _num, card["titleId"]))
                 continue
             if tlang == "en":
                 cc = copy.copy(c)
@@ -122,7 +134,7 @@ for card in cards_json:
                 ["{}/{}.jpg".format(folder, id), "{}/{}_back.jpg".format(folder, id)],
             ):
                 if not os.path.exists(path):
-                    dl(images["large"], path)
+                    dl(images["normal"], path)
 
 
 # Update card db in client application
@@ -139,11 +151,13 @@ with open("client/src/main/cards.js", "w") as f:
 from collections import defaultdict
 
 failedcsv = defaultdict(list)
-for (lang, set, cid) in failed:
-    failedcsv[(set, cid)].append(lang)
+for (lang, set, cid, tid) in failed:
+    failedcsv[(set, cid, tid)].append(lang)
 
 with open("cards.missing.csv", "w") as f:
     w = csv.writer(f)
     w.writerow(["set", "cid", "languages"])
     for k, v in failedcsv.items():
         w.writerow([k[0], k[1], " ".join(v)])
+        if "en" in v:
+            print("Missing card in english:", k[0], k[1], loc[k[2]])
