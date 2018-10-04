@@ -129,4 +129,9 @@ export default {
     let active = !!d.data && !!d.data.overlay['1'].active && d.data.overlay['1'].id === client_id
     commit('statusUpdate', { extactive: active })
   },
+  async hydrateUserLogin(ctx) {
+    if (!ctx.state.token) return
+    let d = await kraken(ctx, `users/${ctx.state.token.channelID}`)
+    ctx.commit('hydrateUserLogin', d.name)
+  },
 }

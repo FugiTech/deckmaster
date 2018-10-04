@@ -40,7 +40,7 @@ export default {
   },
   computed: {
     previewImage() {
-      let login = this.$store.state.oauth ? this.$store.state.oauth.username.toLowerCase() : ''
+      let login = this.$store.state.token ? this.$store.state.token.login : ''
       return `https://static-cdn.jtvnw.net/previews-ttv/live_user_${login}-1424x800.jpg?ts=${+this.now}`
     },
   },
@@ -77,7 +77,7 @@ export default {
       this.movefns[1](e, true)
     },
     distance(e, vertical) {
-      return vertical ? 100 * (e['pageY'] - this['startY']) / this.$refs.container['clientHeight'] : 100 * (e['pageX'] - this['startX']) / this.$refs.container['clientWidth']
+      return vertical ? (100 * (e['pageY'] - this['startY'])) / this.$refs.container['clientHeight'] : (100 * (e['pageX'] - this['startX'])) / this.$refs.container['clientWidth']
     },
 
     null(e, vertical) {},

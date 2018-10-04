@@ -142,7 +142,7 @@ with open("client/src/main/cards.js", "w") as f:
     f.write("const AllCards = new Map([\n")
     for d in sorted(all_cards, key=lambda c: c["ArenaID"]):
         f.write(
-            '\t[{ArenaID}, {{ID: "{ArenaID}", name: "{Name}", set: "{Set}", number: {CollectorNumber}, color: "{Colors}", rarity: "{Rarity}", cmc: {CMC}, dualSided: {DualSided}}}],\n'.format(
+            '\t[{ArenaID}, {{ID: "{ArenaID}", name: "{Name}", set: "{Set}", number: "{CollectorNumber}", color: "{Colors}", rarity: "{Rarity}", cmc: {CMC}, dualSided: {DualSided}}}],\n'.format(
                 **d
             )
         )

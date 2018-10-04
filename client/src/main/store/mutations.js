@@ -51,6 +51,10 @@ const mutations = {
       })
     })
   },
+  hydrateUserLogin(state, login) {
+    if (!state.token) return
+    state.token.login = login
+  },
   loginState(state, loginState) {
     state.loginState = loginState
     state.loginNonce = nanoid()

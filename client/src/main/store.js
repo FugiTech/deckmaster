@@ -87,6 +87,9 @@ export default function(path, ipc) {
       )
     } catch (e) {}
   }
+  if (store.state.token && !store.state.token.login) {
+    store.dispatch('hydrateUserLogin')
+  }
   configureScope(scope => {
     scope.setUser({
       id: store.state.token ? store.state.token.channelID : undefined,
@@ -151,6 +154,7 @@ export default function(path, ipc) {
         }
         if ('loginData' in d) {
           store.commit('login', d['loginData'])
+          store.dispatch('hydrateUserLogin')
         }
         if ('vote' in d) {
           store.dispatch('addDraftVote', d['vote'])
