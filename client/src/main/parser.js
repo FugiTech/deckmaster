@@ -201,12 +201,12 @@ export default class Parser {
 
       if (zone.zoneId === 28) {
         // Battlefield
-        this.gameState.player.lands = this.sort(l)
-        this.gameState.player.creatures = this.sort(c)
-        this.gameState.player.permanents = this.sort(o)
-        this.gameState.opponent.lands = this.sort(ol)
-        this.gameState.opponent.creatures = this.sort(oc)
-        this.gameState.opponent.permanents = this.sort(oo)
+        this.gameState.player.lands = this.battlefieldSort(l)
+        this.gameState.player.creatures = this.battlefieldSort(c)
+        this.gameState.player.permanents = this.battlefieldSort(o)
+        this.gameState.opponent.lands = this.battlefieldSort(ol)
+        this.gameState.opponent.creatures = this.battlefieldSort(oc)
+        this.gameState.opponent.permanents = this.battlefieldSort(oo)
         this.gameState.attachments.player = a
         this.gameState.attachments.opponent = oa
       } else if (zone.zoneId === 29) {
@@ -358,6 +358,14 @@ export default class Parser {
         if (_.includes(lands, d.name)) rarity = 'land'
         return _.indexOf(rarityOrder, rarity)
       })
+      .value()
+  }
+
+  battlefieldSort(cards) {
+    return _.chain(cards)
+      .map(c => +c)
+      .sortBy(c => -c)
+      .sortBy(c => (AllCards.get(c) || { set: '' }).set.length)
       .value()
   }
 
