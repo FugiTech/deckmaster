@@ -100,7 +100,7 @@ export default {
     }
     commit('archiveExtensions', {
       overlay: d.data.overlay['1'].id === client_id ? { 1: { active: false } } : d.data.overlay,
-      component: d.data.component,
+      // component: d.data.component,
     })
     d = await helix(ctx, 'users/extensions', {
       method: 'PUT',

@@ -92,9 +92,11 @@ for l in loc_list:
 # Download images
 failed = []
 all_cards = []
+all_all_cards = []
 
 
 def dl(url, path):
+    return
     try:
         urlretrieve(url, path)
         print("{} => {}".format(url, path))
@@ -120,9 +122,12 @@ for card in cards_list:
             if c is None:
                 failed.append((slang, _set, _num, card["titleId"]))
                 continue
+
+            cc = copy.copy(c)
+            cc["ArenaID"] = id
+            cc["lang"] = tlang
+            all_all_cards.append(cc)
             if tlang == "en":
-                cc = copy.copy(c)
-                cc["ArenaID"] = id
                 all_cards.append(cc)
 
             folder = "cards/{}/{:02d}".format(tlang, int(id) % 20)
@@ -147,6 +152,16 @@ with open("client/src/main/cards.js", "w") as f:
             )
         )
     f.write("])\n\nexport default AllCards\n")
+
+with open("redirector/cards.js", "w") as f:
+    f.write("const Cards = new Map([\n")
+    for d in sorted(all_all_cards, key=lambda c: c["ArenaID"]):
+        f.write(
+            '\t["{ArenaID}-{lang}", {{ID: "{ArenaID}", name: "{Name}", set: "{Set}", number: "{CollectorNumber}", color: "{Colors}", rarity: "{Rarity}", cmc: {CMC}, dualSided: {DualSided}, images: {Images}}}],\n'.format(
+                **d
+            )
+        )
+    f.write("])\n\module.exports = Cards\n")
 
 from collections import defaultdict
 

@@ -1,0 +1,13 @@
+{
+  "name": "deckmaster-cards",
+  "scripts": {
+    "start": "micro index.js",
+    "dev": "micro-dev index.js"
+  },
+  "dependencies": {
+    "micro": "^9.3.3"
+  },
+  "devDependencies": {
+    "micro-dev": "^3.0.0"
+  }
+}
