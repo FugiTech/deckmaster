@@ -1,0 +1,13 @@
+apiVersion: skaffold/v1beta1
+kind: Config
+build:
+  artifacts:
+    - image: gcr.io/fugi-tech/deckmaster
+  tagPolicy:
+    sha256: {}
+  googleCloudBuild:
+    projectId: fugi-tech
+deploy:
+  kubectl:
+    manifests:
+      - k8s.yaml

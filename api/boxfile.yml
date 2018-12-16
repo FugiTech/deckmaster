@@ -1,7 +1,0 @@
-run.config:
-  engine: nodejs
-
-web.deckmaster_api:
-  start: node main.js
-  routes:
-    - 'deckmaster-api:/'

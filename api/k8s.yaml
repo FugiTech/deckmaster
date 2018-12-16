@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deckmaster
+  labels:
+    app: deckmaster
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deckmaster
+  template:
+    metadata:
+      labels:
+        app: deckmaster
+    spec:
+      containers:
+        - name: deckmaster
+          image: gcr.io/fugi-tech/deckmaster
+          ports:
+            - containerPort: 8080
+          env:
+            - name: EXT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: deckmaster-secrets
+                  key: EXT_SECRET
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: deckmaster-secrets
+                  key: CLIENT_SECRET
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deckmaster
+  labels:
+    app: deckmaster
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      name: web
+  selector:
+    app: deckmaster
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: deckmaster
+spec:
+  rules:
+    - host: deckmaster.fugi.tech
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: deckmaster
+              servicePort: web
