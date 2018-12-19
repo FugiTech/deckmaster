@@ -22,6 +22,7 @@ export default {
   watch: {
     src: function() {
       this.loaded = false
+      this.fallback = false
     },
   },
 }
