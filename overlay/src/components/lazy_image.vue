@@ -22,6 +22,11 @@ export default {
   watch: {
     src: function() {
       this.loaded = false
+    },
+    card: function() {
+      this.fallback = false
+    },
+    back: function() {
       this.fallback = false
     },
   },
