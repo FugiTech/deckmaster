@@ -4,22 +4,12 @@ const { send } = require('micro')
 const Cards = require('./cards')
 
 module.exports = async (request, response) => {
-  let p = url.parse(request.url).pathname.split('/')
-  if (p[1] === 'logo.png') {
-    return new Promise(resolve => {
-      fs.readFile('logo.png', (err, data) => {
-        if (err) {
-          send(response, 500)
-        } else {
-          response.setHeader('Content-type', 'image/png')
-          send(response, 200, data)
-        }
-        resolve()
-      })
-    })
-  }
+  response.setHeader('Cache-Control', 'max-age=3600')
+  let u = url.parse(request.url)
+  let p = u.pathname.split('/')
   if (p.length < 5 || p[1] !== 'cards') {
-    send(response, 404)
+    response.setHeader('Location', `https://deckmaster.netlify.com${u.path}`)
+    send(response, 301)
     return
   }
 
@@ -32,6 +22,6 @@ module.exports = async (request, response) => {
     send(response, 404)
   } else {
     response.setHeader('Location', card.images[back ? 1 : 0].normal)
-    send(response, 302)
+    send(response, 301)
   }
 }
