@@ -1,13 +1,16 @@
 {
   "name": "deckmaster-cards",
-  "scripts": {
-    "start": "micro index.js",
-    "dev": "micro-dev index.js"
-  },
   "dependencies": {
-    "micro": "^9.3.3"
+    "serverless-kubeless": "^0.4.0"
   },
-  "devDependencies": {
-    "micro-dev": "^3.0.0"
-  }
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "serverless",
+    "kubeless"
+  ],
+  "author": "The Kubeless Authors",
+  "license": "Apache-2.0"
 }
