@@ -19,8 +19,6 @@ provider:
   name: kubeless
   runtime: nodejs8
   hostname: deckmaster.fugi.io
-  ingress:
-    class: traefik
 
 plugins:
   - serverless-kubeless
@@ -28,6 +26,3 @@ plugins:
 functions:
   redirector:
     handler: handler.redirector
-    events:
-      - http:
-        path: /

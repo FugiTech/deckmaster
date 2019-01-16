@@ -192,7 +192,7 @@ with open("redirector/cards.js", "w") as f:
                 **d
             )
         )
-    f.write("])\n\module.exports = Cards\n")
+    f.write("])\n\nmodule.exports = Cards\n")
 
 from collections import defaultdict
 
