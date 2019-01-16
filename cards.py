@@ -1,4 +1,4 @@
-import sys, os, io, json, csv, zlib, copy
+import sys, os, io, json, csv, zlib, copy, datetime
 import requests
 import unitypack
 from urllib.request import urlretrieve
@@ -22,15 +22,9 @@ languages = {
     # #"zht": "zh", # Traditional Chinese
 }
 
-# Load data about cards we've seen before
-cards_db = {}
-scryfall_data = requests.get(
-    "https://archive.scryfall.com/json/scryfall-all-cards.json"
-).json()
-for o in scryfall_data:
-    if o["object"] != "card":
-        continue
-    cards_db[(o["set"], o["collector_number"], o["lang"])] = {
+
+def convert(o):
+    return {
         "ScryfallID": o["id"],
         "Set": o["set"],
         "CollectorNumber": o["collector_number"],
@@ -44,8 +38,21 @@ for o in scryfall_data:
         else [cf["image_uris"] for cf in o["card_faces"]],
     }
 
+
+# Load data about cards we've seen before
+cards_db = {}
+scryfall_data = requests.get(
+    "https://archive.scryfall.com/json/scryfall-all-cards.json?{}".format(
+        datetime.datetime.today().timestamp()
+    )
+).json()
+for o in scryfall_data:
+    if o["object"] != "card":
+        continue
+    cards_db[(o["set"], o["collector_number"], o["lang"])] = convert(o)
+
 # Download the latest cards.json from wizards
-CDN_URL = "http://mtga-assets.dl.wizards.com"
+""" CDN_URL = "http://mtga-assets.dl.wizards.com"
 
 version = sys.argv[1].strip("v")
 if version == "":
@@ -81,7 +88,15 @@ loc_list = json.loads(
 )
 
 with open("cards.json", "w") as f:
-    f.write(json.dumps(cards_list))
+    f.write(json.dumps(cards_list)) """
+
+cards_list = []
+with open("cards.json", "r") as f:
+    cards_list = json.load(f)
+
+loc_list = []
+with open("loc.json", "r") as f:
+    loc_list = json.load(f)
 
 loc = {}
 for l in loc_list:
@@ -112,7 +127,7 @@ for card in cards_list:
         )
         _num = card["CollectorNumber"]
         if _set == "tana":
-            _set = ana
+            _set = "ana"
             _num = "T" + _num
         if _num.startswith("GR"):
             _set = "med"
@@ -120,8 +135,24 @@ for card in cards_list:
         for [slang, tlang] in languages.items():
             c = cards_db.get((_set, _num, slang))
             if c is None:
-                failed.append((slang, _set, _num, card["titleId"]))
-                continue
+                if slang != "en":
+                    failed.append((slang, _set, _num, card["titleId"]))
+                    continue
+
+                print(
+                    "{}/{}/{} isn't in the database, fetching from the API...".format(
+                        _set, _num, slang
+                    )
+                )
+                r = requests.get(
+                    "https://api.scryfall.com/cards/{}/{}/{}".format(_set, _num, slang),
+                    timeout=1,
+                )
+                if r.status_code == requests.codes.ok:
+                    c = convert(r.json())
+                else:
+                    failed.append((slang, _set, _num, card["titleId"]))
+                    continue
 
             cc = copy.copy(c)
             cc["ArenaID"] = id
