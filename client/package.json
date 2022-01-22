@@ -61,7 +61,7 @@
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.10",
     "moment": "^2.22.2",
-    "nanoid": "^1.1.0",
+    "nanoid": "^3.1.31",
     "node-fetch": "^2.2.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
